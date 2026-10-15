@@ -1,0 +1,27 @@
+{
+  "DevLogInspector": {
+    "confirmClearLogs": "開発者ログをすべて初期化しますか？",
+    "apiLogsLabel": "APIログ",
+    "title": "🛠️ 開発者 API & LLM リアルタイムインスペクター",
+    "subtitle": "すべてのAPIリクエスト（Input）とレスポンス（Output）、Geminiプロンプトと元の応答をリアルタイムで確認します。",
+    "autoRefreshToggle": "2秒周期の自動更新切り替え",
+    "liveUpdate": "リアルタイム更新",
+    "manualRefresh": "手動更新",
+    "clearLogs": "ログを空にする",
+    "close": "閉じる",
+    "tabHttpApi": "HTTP API リクエスト/レスポンス",
+    "tabGeminiLlm": "Gemini AI モデル呼び出し",
+    "searchPlaceholder": "URL、インテント、キーワードフィルター...",
+    "noApiLogs": "記録されたHTTP APIリクエストがありません。",
+    "requestPayload": "📥 入力値 (Request Payload)",
+    "copied": "コピー済み",
+    "copy": "コピー",
+    "empty": "(Empty)",
+    "responsePayload": "📤 出力値 (Response Payload)",
+    "errorLogPrefix": "⚠️ エラーログ: ",
+    "noLlmLogs": "記録されたGemini AIモデル呼び出しがありません。",
+    "promptLengthInfo": "(入力: {input}文字 / 出力: {output}文字)",
+    "promptFull": "📝 Geminiに送信されたプロンプト全文",
+    "responseFull": "🤖 Gemini元の応答内容"
+  }
+}

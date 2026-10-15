@@ -1,0 +1,24 @@
+{
+  "ArbitrationConsole": {
+    "stanceApprove": "賛成",
+    "stanceReject": "反対",
+    "stanceConditional": "条件付き",
+    "stanceNeutral": "中立",
+    "profileGuardrail": "プロフィールガードレール:",
+    "dailyBudget": "1日 {budget}ウォン 予算",
+    "maxWeeklyHours": "週 {hours}時間 上限",
+    "minSleepFamilyHobby": "睡眠 {sleep}h · 家族 {family}回 · 趣味 {hobby}h",
+    "layer2_3Title": "Layer 2-3: ドメイン委員会の審議と最高仲裁官の判決",
+    "conflictDetected": "ドメイン間の意見の対立を検知: 専門エージェント間の対立により、対立レポートが作成され最高仲裁官に報告されました。",
+    "verdictCompleted": "判決完了",
+    "reportEscalation": "▼ 対立レポート報告 → 最高仲裁官の審議 ▼",
+    "governorVerdictTitle": "最高仲裁官の判決",
+    "verdictApprove": "承認",
+    "verdictReject": "却下",
+    "verdictConditional": "条件付き修正",
+    "violation": "違反",
+    "l2ReviewConditions": "L2 猶予条件",
+    "governorDrafting": "Layer 3: 最高仲裁官（Chief Governor）がドメイン間の対立を仲裁し、判決文を作成中です...",
+    "governorDraftingDesc": "ドメイン委員会の審議結果を統合し、憲法遵守の有無およびパレートのカウンターオファーを導き出しています。"
+  }
+}

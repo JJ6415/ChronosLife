@@ -1,0 +1,24 @@
+{
+  "ArbitrationConsole": {
+    "stanceApprove": "찬성",
+    "stanceReject": "반대",
+    "stanceConditional": "조건부",
+    "stanceNeutral": "중립",
+    "profileGuardrail": "프로필 가드레일:",
+    "dailyBudget": "일일 {budget}원 예산",
+    "maxWeeklyHours": "주 {hours}시간 상한",
+    "minSleepFamilyHobby": "수면 {sleep}h · 가족 {family}회 · 취미 {hobby}h",
+    "layer2_3Title": "Layer 2-3: 도메인 위원회 심의 & 최고 중재관 판결",
+    "conflictDetected": "도메인 간 의견 상충 감지됨: 전문 에이전트 간 대립에 따라 상충 보고서가 작성되어 최고 중재관에 상신되었습니다.",
+    "verdictCompleted": "판결 완료",
+    "reportEscalation": "▼ 상충 보고서 상신 → 최고 중재관 심의 ▼",
+    "governorVerdictTitle": "최고 중재관 판결",
+    "verdictApprove": "승인",
+    "verdictReject": "기각",
+    "verdictConditional": "조건부수정",
+    "violation": "위반",
+    "l2ReviewConditions": "L2 유예 조건",
+    "governorDrafting": "Layer 3: 최고 중재관(Chief Governor)이 도메인 상충을 중재하고 판결문을 작성 중입니다...",
+    "governorDraftingDesc": "도메인 위원회 심의 결과를 수합하여 헌법 준수 여부 및 파레토 카운터오퍼를 도출하고 있습니다."
+  }
+}

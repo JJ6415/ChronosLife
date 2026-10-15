@@ -1,0 +1,24 @@
+{
+  "OrchestratorTraceViewer": {
+    "header_title": "Layer 1: Intent Orchestrator Transparent Audit Trace",
+    "header_badge": "Live Dispatched",
+    "header_desc": "Actual context prompt records dispatched by the top AI orchestrator breaking down utterance intents to specialized agents.",
+    "label_intent": "Identified Agenda Intent",
+    "default_intent": "📋 General Agenda",
+    "label_finance_status": "Financial Nature Judgment",
+    "default_finance_status": "No Financial Expenditure",
+    "label_engine": "Orchestration Engine",
+    "default_engine": "Gemini 3.5 Flash",
+    "reasoning_title": "Orchestrator's Breakdown and Routing Reasoning",
+    "directives_title": "Prompts Dispatched to Domain Agents in Real-time",
+    "agent_finance": "Finance Agent Directives",
+    "default_finance_prompt": "Evaluate basic financial impact and disposable income opportunity cost",
+    "agent_career": "Career Agent Directives",
+    "default_career_prompt": "Evaluate tradeoff between career market value increase and burnout risk",
+    "agent_wellbeing": "Wellbeing Agent Directives",
+    "default_wellbeing_prompt": "Protect 3 family dinners/week, 7 hrs sleep, and 4 hrs weekend hobby quota",
+    "agent_governor": "Chief Governor Arbitration Guideline",
+    "default_governor_prompt": "Protect L4 constitution, exclude AI flattery, derive Pareto conditional modification approval",
+    "btn_copy_title": "Copy"
+  }
+}

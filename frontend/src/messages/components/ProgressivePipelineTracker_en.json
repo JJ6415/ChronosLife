@@ -1,0 +1,21 @@
+{
+  "ProgressivePipelineTracker": {
+    "dlp_name": "Layer 0: Privacy Sandbox (DLP)",
+    "dlp_subtext": "Real-time virtual tokenization of ultra-sensitive PII (Preemptive Defense)",
+    "orchestrator_name": "Layer 1: Intent Orchestration",
+    "orchestrator_subtext": "Decomposition of sanitized prompt intents & dispatching agent instructions",
+    "council_name": "Layer 2: Tri-Subagent Council Review",
+    "council_subtext": "Independent evaluation of Finance, Career, Wellbeing constitutional guardrails",
+    "governor_name": "Layer 3: Chief Governor's Ruling",
+    "governor_subtext": "Deriving Pareto-optimal arbitration and sustainable counteroffers",
+    "trajectory_name": "Layer 4 & 5: Triple Trajectory & 5-Panel Comic",
+    "trajectory_subtext": "Baseline vs As-Is vs Governed triple trajectory and webtoon chronicle",
+    "title": "Real-time Step-by-Step Governance Pipeline",
+    "all_completed": "All Reviews Completed",
+    "updating_realtime": "Updating Real-time ({current}/5)",
+    "default_status": "Dashboard will unlock in real-time as each layer's review completes.",
+    "completed": "Completed",
+    "running": "Running",
+    "step": "Step {index}"
+  }
+}

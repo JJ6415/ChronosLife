@@ -1,0 +1,12 @@
+{
+  "EkispertActionCard": {
+    "title": "🚶 Layer 5: Ekispert MCP Micro-Mobility Prescription",
+    "before_title": "Before - Shortest Transit Route",
+    "after_title": "After - Healing Green Walk Route",
+    "method_label": "Transit:",
+    "congestion_label": "Congestion:",
+    "saved_amount_label": "💰 Saved Expense: ${amount}",
+    "calories_label": "🔥 Prevented Calories: {amount} kcal",
+    "wellness_label": "🧘 Wellness Impact: {text}"
+  }
+}

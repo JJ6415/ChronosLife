@@ -1,0 +1,24 @@
+{
+  "OrchestratorTraceViewer": {
+    "header_title": "Layer 1: 인텐트 오케스트레이터 투명 감사 백로그 (Audit Trace)",
+    "header_badge": "Live Dispatched",
+    "header_desc": "상위 AI 오케스트레이터가 발화 의도를 분해하여 각 전문 에이전트에 하달한 실제 컨텍스트 프롬프트 기록입니다.",
+    "label_intent": "식별된 안건 인텐트",
+    "default_intent": "📋 일반 안건",
+    "label_finance_status": "재정 성격 판정",
+    "default_finance_status": "재정 지출 없음",
+    "label_engine": "오케스트레이션 엔진",
+    "default_engine": "Gemini 3.5 Flash",
+    "reasoning_title": "오케스트레이터의 분해 및 라우팅 근거 (Reasoning)",
+    "directives_title": "각 도메인 에이전트에 실시간 주입된 프롬프트 (Dispatched Directives)",
+    "agent_finance": "Finance Agent 하달 지침",
+    "default_finance_prompt": "기본 재정 영향도 및 가처분 소득 기회비용 평가",
+    "agent_career": "Career Agent 하달 지침",
+    "default_career_prompt": "커리어 시장 가치 상승과 번아웃 위험도 상충 평가",
+    "agent_wellbeing": "Wellbeing Agent 하달 지침",
+    "default_wellbeing_prompt": "주 3회 가족 식사, 수면 7시간 및 주말 취미 4시간 쿼터 수호",
+    "agent_governor": "Chief Governor 중재 가이드라인",
+    "default_governor_prompt": "L4 헌법 수호 및 AI 영합 배제, 파레토 조건부 수정 승인안 도출",
+    "btn_copy_title": "복사"
+  }
+}

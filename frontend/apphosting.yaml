@@ -1,0 +1,23 @@
+# ============================================
+# Firebase App Hosting Configuration for ChronosLife
+# ============================================
+# Specification: https://firebase.google.com/docs/app-hosting/configure
+
+runConfig:
+  minInstances: 0
+  maxInstances: 5
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 1024
+
+env:
+  - variable: NEXT_PUBLIC_API_URL
+    value: https://chronoslife-backend-27246861924.asia-northeast1.run.app
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NODE_ENV
+    value: production
+    availability:
+      - BUILD
+      - RUNTIME

@@ -1,0 +1,11 @@
+{
+  "DlpComparisonViewer": {
+    "layer_title": "🔒 Layer 0: Privacy Sandbox (Cloud DLP De-identification)",
+    "raw_input": "Raw Input Text",
+    "pii_included": "⚠️ PII Included",
+    "sanitized_text": "Sanitized Text",
+    "safe": "✅ Safe",
+    "detected_entities": "Detected Entities:",
+    "none": "None"
+  }
+}

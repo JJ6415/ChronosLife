@@ -1,0 +1,21 @@
+{
+  "ProgressivePipelineTracker": {
+    "dlp_name": "Layer 0: プライバシー・サンドボックス (DLP)",
+    "dlp_subtext": "超機密個人情報のリアルタイム仮想トークン化 (先制防御)",
+    "orchestrator_name": "Layer 1: インテント・オーケストレーション",
+    "orchestrator_subtext": "匿名化プロンプトのインテント分解 & エージェントへの指示伝達",
+    "council_name": "Layer 2: 3大サブエージェント審議",
+    "council_subtext": "財務・キャリア・ウェルビーイングの憲法ガードレール独立評価",
+    "governor_name": "Layer 3: 最高仲裁官の判決",
+    "governor_subtext": "パレート最適の仲裁案および持続可能なカウンターオファーの導出",
+    "trajectory_name": "Layer 4 & 5: 3重軌跡 & 5コマ漫画",
+    "trajectory_subtext": "基準 vs 原案 vs 仲裁案の3重軌跡およびウェブトゥーン・クロニクル",
+    "title": "段階別リアルタイムガバナンスパイプライン",
+    "all_completed": "全審議完了",
+    "updating_realtime": "リアルタイム段階的更新中 ({current}/5)",
+    "default_status": "各階層の審議が完了次第、ダッシュボードがリアルタイムでロック解除されます。",
+    "completed": "完了",
+    "running": "実行中",
+    "step": "Step {index}"
+  }
+}

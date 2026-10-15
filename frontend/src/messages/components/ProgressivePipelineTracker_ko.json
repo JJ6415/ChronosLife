@@ -1,0 +1,21 @@
+{
+  "ProgressivePipelineTracker": {
+    "dlp_name": "Layer 0: Privacy Sandbox (DLP)",
+    "dlp_subtext": "초민감 개인정보 실시간 가상 토큰화 (선제 방어)",
+    "orchestrator_name": "Layer 1: 인텐트 오케스트레이션",
+    "orchestrator_subtext": "비식별 프롬프트 인텐트 분해 & 에이전트 지침 하달",
+    "council_name": "Layer 2: 3대 서브에이전트 심의",
+    "council_subtext": "재정 • 커리어 • 웰빙 헌법 가드레일 독립 평가",
+    "governor_name": "Layer 3: 최고 중재관 판결",
+    "governor_subtext": "파레토 최적 중재안 및 지속가능한 카운터오퍼 도출",
+    "trajectory_name": "Layer 4 & 5: 3중 궤적 & 5컷 만화",
+    "trajectory_subtext": "기준 vs 원안 vs 중재안 3중 궤적 및 웹툰 크로니클",
+    "title": "단계별 실시간 거버넌스 파이프라인",
+    "all_completed": "전체 심의 완료",
+    "updating_realtime": "실시간 단계별 갱신 중 ({current}/5)",
+    "default_status": "각 계층의 심의가 완료되는 즉시 대시보드가 실시간으로 잠금 해제됩니다.",
+    "completed": "완료",
+    "running": "실행 중",
+    "step": "Step {index}"
+  }
+}

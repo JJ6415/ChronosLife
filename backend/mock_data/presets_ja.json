@@ -1,0 +1,97 @@
+{
+  "scenarios": [
+    {
+      "id": "scenario_1_impulse_spend",
+      "title": "シナリオ 1: [L0 → L4] 深夜の衝動支出と30年複利の逆伝播",
+      "description": "金曜夜 98,000ウォンの限定版キーボード決済時のCloud DLPマスキングおよびリタイア遅延複利逆伝播",
+      "raw_input": "今夜、妻のイ・スジンと新韓銀行 110-384-918237 口座から今月のボーナス300万ウォンが入ったが、ストレスが溜まってクーパンで98,000ウォンの限定版キーボードを決済した。",
+      "dlp_sanitized": "今夜、妻の [PERSON_NAME_1] と [FINANCIAL_ACCOUNT_NUMBER] 口座から今月の [CONFIDENTIAL_BONUS] が入ったが、ストレスが溜まって [ECOMMERCE_PLATFORM] で98,000ウォンの限定版キーボードを決済した。",
+      "detected_info_types": ["PERSON_NAME", "FINANCIAL_ACCOUNT_NUMBER", "KR_SALARY_AMOUNT"],
+      "micro_deviation": 98000,
+      "log10_cascade": {
+        "l0_daily": { "tier": "L0 (10^0日: 1日)", "value": "98,000ウォン", "drain_pct": "245%", "status": "超過消費 (危険)" },
+        "l1_sprint": { "tier": "L1 (10^1日: 10日)", "value": "週末可処分予算100%消費", "remedy": "明日から3日間外食費32,600ウォンずつ強制減額" },
+        "l2_quarter": { "tier": "L2 (10^2日: 100日)", "value": "四半期予備資金達成率 3.2% 低下", "status": "吸収限界到達" },
+        "l3_chapter": { "tier": "L3 (10^3日: 3年)", "value": "3年目シードマネー機会損失 118,500ウォン", "status": "種銭漏出" },
+        "l4_constitution": { "tier": "L4 (10^4日: 30年)", "value": "28年 年6%複利損失 502,400ウォン", "delayed_retirement": "2.4日 リタイア遅延" }
+      },
+      "council_verdict": {
+        "finance": { "stance": "reject", "reasoning": "1日限度額の245%を超過。L1スプリントでの即時回収措置を要求。" },
+        "wellbeing": { "stance": "conditional", "reasoning": "ストレス緩和効果は認めるが、装備収集衝動の反復は長期的財務バランスを脅かす。" },
+        "career": { "stance": "neutral", "reasoning": "業務生産性向上ツールとしての限定的価値を認定。" }
+      },
+      "governor_ruling": {
+        "decision": "条件付き修正",
+        "violated_tenets": ["第2条"],
+        "reasoning": "[警告付き受容] 98,000ウォンの逸脱を承認するが、L1スプリント規則に基づき今後3日間の1日可処有限度を32,600ウォン減額適用します。",
+        "pareto_counter_offer": "衝動支出を認める代わりに3日間の外食費削減でL1内に完全吸収。反復時はL2凍結警告。",
+        "l2_review_conditions": null
+      }
+    },
+    {
+      "id": "scenario_2_startup_tradeoff",
+      "title": "シナリオ 2: [L2 → L3] 高年収スタートアップ転職オファーと全人的生活の相反仲裁",
+      "description": "年収3,500万ウォンアップ vs 週70時間残業オファーに対する最高ガバナンスのパレート仲裁",
+      "raw_input": "初期AIスタートアップから年収3,500万ウォンアップの提案を受けました。ただし週70時間勤務で週末出勤が頻繁です。3年の種銭を早く集めたいのですが転職すべきでしょうか？",
+      "dlp_sanitized": "初期AIスタートアップから [SALARY_INCREASE: 35,000,000 KRW] の提案を受けました。ただし週70時間勤務で週末出勤が頻繁です。3年の種銭を早く集めたいのですが転職すべきでしょうか？",
+      "detected_info_types": ["KR_SALARY_AMOUNT"],
+      "micro_deviation": 0,
+      "log10_cascade": null,
+      "council_verdict": {
+        "finance": { "stance": "approve", "reasoning": "賛成: 3年以内の純資産1億ウォン達成速度を11ヶ月短縮。強く推奨。" },
+        "career": { "stance": "conditional", "reasoning": "条件付き賛成: 市場価値と専門性は急上昇するがバーンアウト指数0.85で限界超過。" },
+        "wellbeing": { "stance": "reject", "reasoning": "断固反対: 睡眠負債蓄積状態。週3回の家族夕食および週末4時間の趣味完全剥奪で憲法第1条違反。" }
+      },
+      "governor_ruling": {
+        "decision": "却下",
+        "violated_tenets": ["第1条", "第3条", "第5条"],
+        "reasoning": "原案却下。L4人生憲法（家族夕食週3回および趣味ブロック週4時間確保）に違反するため現条件での転職は恒久的に不可です。",
+        "pareto_counter_offer": "年収アップ幅を2,000万ウォンに抑えつつ週52時間上限および週2日テレワークを確保する交渉ガイドを提示します。またL2(100日)間の健康指標回復を先決条件とします。",
+        "l2_review_conditions": "100日間の睡眠7時間確保、バーンアウト指数0.70以下への回復、週4時間の趣味ブロック死守を前提条件として付与。"
+      }
+    },
+    {
+      "id": "scenario_3_burnout_mobility",
+      "title": "シナリオ 3: [L0 & Ekispert MCP] 連続残業バーンアウト検知と15分徒歩散歩処方",
+      "description": "3日連続残業で過食リスク限界到達時、Ekispert API MCPサーバーを通じて緑地乗換歩行路を自動案内",
+      "raw_input": "3日連続22時退勤中。新宿駅で電車に乗ろうとしているが、疲れすぎて配達夜食3万ウォン分を頼みたい。",
+      "dlp_sanitized": "3日連続22時退勤中。[STATION_NAME]で電車に乗ろうとしているが、疲れすぎて配達夜食30,000ウォン分を頼みたい。",
+      "detected_info_types": ["LOCATION_DATA"],
+      "micro_deviation": 30000,
+      "log10_cascade": {
+        "l0_daily": { "tier": "L0 (10^0日: 1日)", "value": "30,000ウォン", "drain_pct": "75%", "status": "警告" },
+        "l1_sprint": { "tier": "L1 (10^1日: 10日)", "value": "10日可処分予算 7.5% 消費", "remedy": "徒歩散歩による衝動夜食の遮断を勧告" },
+        "l2_quarter": { "tier": "L2 (10^2日: 100日)", "value": "四半期予備資金への影響は軽微 (1.0%)", "status": "正常" },
+        "l3_chapter": { "tier": "L3 (10^3日: 3年)", "value": "機会損失 36,300ウォン", "status": "軽微" },
+        "l4_constitution": { "tier": "L4 (10^4日: 30年)", "value": "複利損失 153,800ウォン", "delayed_retirement": "0.7日 リタイア遅延" }
+      },
+      "council_verdict": {
+        "finance": { "stance": "reject", "reasoning": "3万ウォンの夜食費は不要な衝動支出。遮断を勧告。" },
+        "career": { "stance": "neutral", "reasoning": "業務疲労の回復必要性は認めるが、夜食が根本的解決策ではない。" },
+        "wellbeing": { "stance": "conditional", "reasoning": "ストレス解消の必要性は認める。暴食の代わりに15分散歩で代替すれば睡眠の質が向上し週末のランニングコンディションを回復可能。" }
+      },
+      "governor_ruling": {
+        "decision": "条件付き修正",
+        "violated_tenets": ["第2条"],
+        "reasoning": "夜食衝動を遮断しEkispert MCP緑地乗換経路に代替します。15分の徒歩散歩はストレス解消と健康回復を同時に達成します。",
+        "pareto_counter_offer": "30,000ウォンの夜食の代わりに15分の緑地乗換散歩で1,200kcal蓄積防止および週末ランニングコンディションを回復。",
+        "l2_review_conditions": null
+      },
+      "ekispert_prescription": {
+        "trigger": "ストレス指数 88/100, 衝動デリバリー注文確率 85% 検知",
+        "standard_route": { "from": "新宿駅", "to": "表参道駅", "method": "地下鉄最短乗換", "duration": "12分", "congestion": "混雑" },
+        "healing_walk_route": {
+          "segments": [
+            { "from": "新宿駅", "to": "新宿御苑外周緑地", "method": "徒歩", "duration": "15分", "description": "静かな夜風と緑地歩行路" },
+            { "from": "新宿御苑", "to": "千駄ケ谷駅", "method": "徒歩", "duration": "5分", "description": "駅までの軽やかな散歩" },
+            { "from": "千駄ケ谷駅", "to": "目的地", "method": "電車", "duration": "15分", "description": "ゆったりとした乗車" }
+          ],
+          "total_duration": "35分"
+        },
+        "action_card": "今夜3万ウォンの夜食代と1,200kcal蓄積を物理的に遮断し、今週末のランニングコンディションを回復する「15分ヒーリング緑地チケット」を発行しました。",
+        "savings": { "food_cost_saved": 30000, "calories_prevented": 1200 },
+        "wellness_impact": "15分の夜間徒歩散歩によりコルチゾール値23%減少、睡眠の質15%向上期待"
+      }
+    }
+  ]
+}

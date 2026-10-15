@@ -1,0 +1,11 @@
+{
+  "DlpComparisonViewer": {
+    "layer_title": "🔒 Layer 0: Privacy Sandbox (Cloud DLP 비식별화)",
+    "raw_input": "원본 텍스트 (Raw Input)",
+    "pii_included": "⚠️ PII 포함",
+    "sanitized_text": "비식별화 텍스트 (Sanitized)",
+    "safe": "✅ 안전",
+    "detected_entities": "Detected Entities:",
+    "none": "None"
+  }
+}

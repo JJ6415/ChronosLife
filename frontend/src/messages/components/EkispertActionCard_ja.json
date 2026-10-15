@@ -1,0 +1,12 @@
+{
+  "EkispertActionCard": {
+    "title": "🚶 Layer 5: 駅すぱあと(Ekispert) MCP マイクロモビリティ処方",
+    "before_title": "Before - 最短乗り換えルート",
+    "after_title": "After - ヒーリング緑地散歩ルート",
+    "method_label": "手段:",
+    "congestion_label": "混雑度:",
+    "saved_amount_label": "💰 節約金額: {amount}円",
+    "calories_label": "🔥 阻止カロリー: {amount}kcal",
+    "wellness_label": "🧘 ウェルネス効果: {text}"
+  }
+}

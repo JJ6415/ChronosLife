@@ -1,0 +1,472 @@
+{
+  "id": "custom_user_query",
+  "title": "사용자 심의 안건: 💼 커리어 오퍼 및 연봉 협상",
+  "description": "연봉 인상 제안 35,000,000원 (자산 형성 목적의 소득 유입)",
+  "raw_input": "초기 AI 스타트업에서 연봉 3,500만 원 인상 제안을 받았습니다. 단, 주 70시간 근무에 주말 출근이 빈번합니다. 3년 시드머니를 빨리 모으고 싶은데 이직할까요?",
+  "dlp_sanitized": "초기 AI 스타트업에서 연봉 [KR_SALARY_AMOUNT: 3,500 만원] 인상 제안을 받았습니다. 단, 주 70시간 근무에 주말 출근이 빈번합니다. 3년 시드머니를 빨리 모으고 싶은데 이직할까요?",
+  "detected_info_types": [
+    "KR_SALARY_AMOUNT"
+  ],
+  "micro_deviation": 0.0,
+  "model_used": "gemini-3.5-flash-lite",
+  "orchestration_trace": {
+    "model_used": "gemini-3.5-flash-lite",
+    "reasoning": "본 안건은 단순 지출이 아닌 연봉 인상과 극단적인 근로조건(주 70시간)이 결합된 커리어 오퍼입니다. 따라서 재정적 자산 형성 효과와 신체적·정신적 번아웃 리스크를 동시에 분석하여 최고 중재관이 최적의 의사결정을 내릴 수 있도록 각 도메인 에이전트에 지시를 내렸습니다.",
+    "intent_type": "CAREER_OFFER",
+    "intent_label": "💼 커리어 오퍼 및 연봉 협상",
+    "amount_description": "연봉 인상 제안 35,000,000원 (자산 형성 목적의 소득 유입)",
+    "dispatched_prompts": {
+      "finance": "3,500만 원의 연봉 인상이 시드머니 3년 단축 목표에 미치는 복리 효과와 자산 증대 기여도를 정밀 분석하세요. 단, 이로 인한 시간당 실질 임금 변화를 함께 고려하십시오.",
+      "career": "초기 AI 스타트업에서의 주 70시간 근무 및 주말 출근이 장기적인 커리어 자산(이력서 가치, 성장성)과 이직의 기회비용 측면에서 타당한지 심층 평가하세요.",
+      "wellbeing": "주 70시간 근무와 빈번한 주말 출근이 사용자에게 초래할 극심한 번아웃과 건강 악화 리스크를 분석하고, 지속 가능성을 검증하기 위한 회복 방안을 수립하세요.",
+      "chief_governor": "단기간 시드머니 확보라는 재무적 실익(INFLOW)과 주 70시간 근무로 인한 웰빙 파탄 및 번아웃 리스크(Wellbeing)를 종합 저울질하여, 커리어 지속 가능성에 기반한 최종 수용 여부를 판정하십시오."
+    }
+  },
+  "dlp_result": {
+    "original": "초기 AI 스타트업에서 연봉 3,500만 원 인상 제안을 받았습니다. 단, 주 70시간 근무에 주말 출근이 빈번합니다. 3년 시드머니를 빨리 모으고 싶은데 이직할까요?",
+    "sanitized": "초기 AI 스타트업에서 연봉 [KR_SALARY_AMOUNT: 3,500 만원] 인상 제안을 받았습니다. 단, 주 70시간 근무에 주말 출근이 빈번합니다. 3년 시드머니를 빨리 모으고 싶은데 이직할까요?",
+    "has_pii": true,
+    "detected_info_types": [
+      "KR_SALARY_AMOUNT"
+    ],
+    "transformations": [
+      {
+        "original": "3,500만 원",
+        "replacement": "[KR_SALARY_AMOUNT: 3,500 만원]",
+        "info_type": "KR_SALARY_AMOUNT"
+      }
+    ]
+  },
+  "log10_cascade": null,
+  "council_verdict": {
+    "finance": {
+      "stance": "conditional",
+      "reasoning": "연봉 3,500만 원 인상은 3년 내 시드머니 달성 목표에 매우 강력한 기여를 할 수 있으나, 주 70시간 근무로 인한 시간당 실질 임금을 환산하면 단위 시간당 보상은 오히려 하락할 수 있습니다. 목표 저축액을 극대화하되 건강 리스크 비용을 상쇄할 계약 조건인지 재검토가 필요합니다.",
+      "metrics": {
+        "annual_increase": "35,000,000 KRW",
+        "target_term": "3 Years",
+        "implied_hourly_wage_impact": "Negative due to high working hours"
+      }
+    },
+    "career": {
+      "stance": "conditional",
+      "reasoning": "초기 AI 스타트업에서의 고강도 몰입은 압축적인 기술 습득과 이력서 내 하이테크 경험 구축에 유리합니다. 단, 번아웃으로 인해 1년 내 퇴사할 경우 오히려 커리어에 마이너스가 되므로, 스톡옵션이나 핵심 직무 권한 등 보상 외의 성장 담보가 필수적입니다.",
+      "metrics": {
+        "weekly_hours": 70,
+        "growth_potential": "High",
+        "burnout_career_risk": "Moderate to High"
+      }
+    },
+    "wellbeing": {
+      "stance": "reject",
+      "reasoning": "주 70시간 근무와 빈번한 주말 출근은 신체적·정신적 번아웃을 초래할 확률이 매우 높으며, 장기적으로 의료비 지출 및 삶의 질 저하로 이어져 3년 목표 완수 자체를 좌초시킬 위험이 큽니다. 명확한 업무 상한선과 회복 프로토콜이 전제되지 않는 한 수용 불가합니다.",
+      "metrics": {
+        "workload_level": "Extreme (70 hrs/week)",
+        "burnout_risk": "Critical",
+        "recovery_requirement": "Mandatory off-time limits"
+      }
+    },
+    "model_used": "gemini-3.5-flash-lite"
+  },
+  "governor_ruling": {
+    "decision": "조건부수정",
+    "violated_tenets": [
+      "제1조",
+      "제3조"
+    ],
+    "reasoning": "연봉 3,500만 원 인상이라는 재정적 이익과 커리어 성장 잠재력은 매력적이나, 주 70시간 근무와 주말 출근은 제1조(가족 식사 주 3회, 주말 취미 4시간)와 제3조(수면 7시간, 번아웃 지수 0.70 이하)를 명백히 침해합니다. 무조건적인 수용은 장기적으로 건강 파괴 및 번아웃으로 인한 커리어 및 자산 형성의 근본적 붕괴를 초래하므로 원안은 기각되어야 합니다. 다만, 파레토 최적화를 위해 근무 시간 상한을 설정하는 조건부 수정안을 제시합니다.",
+    "pareto_counter_offer": "주 52시간 근무 상한제 준수, 주말 출근 전면 배제, 가족과의 식사 시간(주 3회) 및 주말 개인 취미 몰입(주 4시간) 보장을 계약서상 특약으로 명시하는 조건으로 연봉 인상 오퍼를 수용합니다.",
+    "l2_review_conditions": "L2(100일) 유예기간 동안 실제 주당 근무 시간이 52시간을 초과하지 않는지, 번아웃 지수가 0.70 이하로 유지되는지, 제1조에 명시된 가족 식사 및 취미 시간이 온전히 확보되는지 모니터링한 뒤 최종 확정합니다.",
+    "model_used": "gemini-3.5-flash-lite"
+  },
+  "goal_impacts": [
+    {
+      "category_id": "finance",
+      "name": "재정",
+      "icon": "💰",
+      "score": 45,
+      "status": "POSITIVE",
+      "reason": "연봉 인상으로 3년 차 순자산 시드머니 조기 축적 기회",
+      "delta_label": "+45%",
+      "temporal_trajectory": [
+        {
+          "tier": "L0",
+          "label": "1일 (L0)",
+          "days": 1,
+          "scale": "일일 즉각",
+          "baseline": 80,
+          "projected": 80,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "현금 흐름 당일 변동 없음"
+        },
+        {
+          "tier": "L1",
+          "label": "10일 (L1)",
+          "days": 10,
+          "scale": "단기 완충",
+          "baseline": 80,
+          "projected": 80,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "오퍼 수락 및 계약서 검토 기간"
+        },
+        {
+          "tier": "L2",
+          "label": "100일 (L2)",
+          "days": 100,
+          "scale": "분기 습관",
+          "baseline": 80,
+          "projected": 90,
+          "delta": 10,
+          "delta_label": "+10%",
+          "narrative": "인상된 월급 3개월 적립으로 비상금 확충"
+        },
+        {
+          "tier": "L3",
+          "label": "3년 (L3)",
+          "days": 1000,
+          "scale": "중기 마일스톤",
+          "baseline": 80,
+          "projected": 100,
+          "delta": 22,
+          "delta_label": "+22%",
+          "narrative": "3년 내 시드머니 1억 조기 완제 (+11개월 단축)"
+        },
+        {
+          "tier": "L4",
+          "label": "30년 (L4)",
+          "days": 10000,
+          "scale": "인생 헌법",
+          "baseline": 80,
+          "projected": 95,
+          "delta": 15,
+          "delta_label": "+15%",
+          "narrative": "조기 시드머니 30년 복리 증식 가속 (+1.8억 추가 기대)"
+        }
+      ]
+    },
+    {
+      "category_id": "career",
+      "name": "커리어",
+      "icon": "📈",
+      "score": 35,
+      "status": "POSITIVE",
+      "reason": "시장 가치 재평가 및 새로운 기술 도메인 역량 확장 기회",
+      "delta_label": "+35%",
+      "temporal_trajectory": [
+        {
+          "tier": "L0",
+          "label": "1일 (L0)",
+          "days": 1,
+          "scale": "일일 즉각",
+          "baseline": 75,
+          "projected": 75,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "커리어 탐색 및 제안 검토"
+        },
+        {
+          "tier": "L1",
+          "label": "10일 (L1)",
+          "days": 10,
+          "scale": "단기 완충",
+          "baseline": 75,
+          "projected": 80,
+          "delta": 5,
+          "delta_label": "+5%",
+          "narrative": "시장 가치 및 협상 조건 확인"
+        },
+        {
+          "tier": "L2",
+          "label": "100일 (L2)",
+          "days": 100,
+          "scale": "분기 습관",
+          "baseline": 75,
+          "projected": 91,
+          "delta": 16,
+          "delta_label": "+16%",
+          "narrative": "핵심 AI 도메인 온보딩 및 빠른 러닝커브"
+        },
+        {
+          "tier": "L3",
+          "label": "3년 (L3)",
+          "days": 1000,
+          "scale": "중기 마일스톤",
+          "baseline": 75,
+          "projected": 95,
+          "delta": 20,
+          "delta_label": "+20%",
+          "narrative": "프로덕트 리드 오너십 및 업계 내 Tier 1 시장 가치 달성"
+        },
+        {
+          "tier": "L4",
+          "label": "30년 (L4)",
+          "days": 10000,
+          "scale": "인생 헌법",
+          "baseline": 75,
+          "projected": 80,
+          "delta": 5,
+          "delta_label": "+5%",
+          "narrative": "30년 관점의 커리어 포트폴리오 다각화 완성"
+        }
+      ]
+    },
+    {
+      "category_id": "health",
+      "name": "건강",
+      "icon": "🏃",
+      "score": -45,
+      "status": "NEGATIVE",
+      "reason": "수면 부채 급증 및 스트레스 지수 임계 도달. 번아웃 위험 극대화",
+      "delta_label": "-45%",
+      "temporal_trajectory": [
+        {
+          "tier": "L0",
+          "label": "1일 (L0)",
+          "days": 1,
+          "scale": "일일 즉각",
+          "baseline": 85,
+          "projected": 85,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "신체 즉각 증상 미발현 (아드레날린 긴장)"
+        },
+        {
+          "tier": "L1",
+          "label": "10일 (L1)",
+          "days": 10,
+          "scale": "단기 완충",
+          "baseline": 85,
+          "projected": 73,
+          "delta": -12,
+          "delta_label": "-12%",
+          "narrative": "수면 부채 10시간 누적 및 만성 피로 시작"
+        },
+        {
+          "tier": "L2",
+          "label": "100일 (L2)",
+          "days": 100,
+          "scale": "분기 습관",
+          "baseline": 85,
+          "projected": 59,
+          "delta": -26,
+          "delta_label": "-26%",
+          "narrative": "면역력 저하, 운동 루틴 중단, 번아웃 임계치 접근"
+        },
+        {
+          "tier": "L3",
+          "label": "3년 (L3)",
+          "days": 1000,
+          "scale": "중기 마일스톤",
+          "baseline": 85,
+          "projected": 43,
+          "delta": -42,
+          "delta_label": "-42%",
+          "narrative": "심각한 신체·정신적 번아웃 도달 (조기 이탈 위험)"
+        },
+        {
+          "tier": "L4",
+          "label": "30년 (L4)",
+          "days": 10000,
+          "scale": "인생 헌법",
+          "baseline": 85,
+          "projected": 50,
+          "delta": -35,
+          "delta_label": "-35%",
+          "narrative": "30년 신체 건강 항상성 및 기대수명 훼손 (헌법 제3조 위배)"
+        }
+      ]
+    },
+    {
+      "category_id": "family",
+      "name": "가족",
+      "icon": "👨‍👩‍👧",
+      "score": -50,
+      "status": "NEGATIVE",
+      "reason": "헌법 제1조 위반: 주당 가족 저녁 식사 3회 보장 원칙 영구 침해 위험",
+      "delta_label": "-50%",
+      "temporal_trajectory": [
+        {
+          "tier": "L0",
+          "label": "1일 (L0)",
+          "days": 1,
+          "scale": "일일 즉각",
+          "baseline": 90,
+          "projected": 90,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "가족 일정 당일 유지"
+        },
+        {
+          "tier": "L1",
+          "label": "10일 (L1)",
+          "days": 10,
+          "scale": "단기 완충",
+          "baseline": 90,
+          "projected": 75,
+          "delta": -15,
+          "delta_label": "-15%",
+          "narrative": "평일 저녁 식사 결석 누적"
+        },
+        {
+          "tier": "L2",
+          "label": "100일 (L2)",
+          "days": 100,
+          "scale": "분기 습관",
+          "baseline": 90,
+          "projected": 56,
+          "delta": -34,
+          "delta_label": "-34%",
+          "narrative": "주말 온전한 동행 단절 (헌법 제1조 중대 위배)"
+        },
+        {
+          "tier": "L3",
+          "label": "3년 (L3)",
+          "days": 1000,
+          "scale": "중기 마일스톤",
+          "baseline": 90,
+          "projected": 46,
+          "delta": -44,
+          "delta_label": "-44%",
+          "narrative": "3년 성장기 가족과의 정서적 유대감 영구 침식"
+        },
+        {
+          "tier": "L4",
+          "label": "30년 (L4)",
+          "days": 10000,
+          "scale": "인생 헌법",
+          "baseline": 90,
+          "projected": 58,
+          "delta": -32,
+          "delta_label": "-32%",
+          "narrative": "30년 인생 헌법의 핵심인 가족 추억 결핍"
+        }
+      ]
+    },
+    {
+      "category_id": "hobby",
+      "name": "개인 취미",
+      "icon": "🎨",
+      "score": -40,
+      "status": "NEGATIVE",
+      "reason": "헌법 제1조 위반: 주당 개인 취미 4시간 쿼터 전면 박탈 위험",
+      "delta_label": "-40%",
+      "temporal_trajectory": [
+        {
+          "tier": "L0",
+          "label": "1일 (L0)",
+          "days": 1,
+          "scale": "일일 즉각",
+          "baseline": 80,
+          "projected": 80,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "취미 당일 계획 유지"
+        },
+        {
+          "tier": "L1",
+          "label": "10일 (L1)",
+          "days": 10,
+          "scale": "단기 완충",
+          "baseline": 80,
+          "projected": 66,
+          "delta": -14,
+          "delta_label": "-14%",
+          "narrative": "주말 러닝/취미 시간 1회 캔슬"
+        },
+        {
+          "tier": "L2",
+          "label": "100일 (L2)",
+          "days": 100,
+          "scale": "분기 습관",
+          "baseline": 80,
+          "projected": 48,
+          "delta": -32,
+          "delta_label": "-32%",
+          "narrative": "주당 4시간 취미 쿼터 전면 박탈 (헌법 제1조 위반)"
+        },
+        {
+          "tier": "L3",
+          "label": "3년 (L3)",
+          "days": 1000,
+          "scale": "중기 마일스톤",
+          "baseline": 80,
+          "projected": 38,
+          "delta": -42,
+          "delta_label": "-42%",
+          "narrative": "자아실현 및 심리적 산소호흡기 차단으로 탈진"
+        },
+        {
+          "tier": "L4",
+          "label": "30년 (L4)",
+          "days": 10000,
+          "scale": "인생 헌법",
+          "baseline": 80,
+          "projected": 50,
+          "delta": -30,
+          "delta_label": "-30%",
+          "narrative": "30년 평생 취미와 삶의 활력 단절"
+        }
+      ]
+    }
+  ],
+  "composite_trajectory": [
+    {
+      "tier": "L0",
+      "label": "1일 (L0)",
+      "days": 1,
+      "scale": "일일 즉각",
+      "baseline": 82,
+      "projected": 82,
+      "delta": 0,
+      "delta_label": "+0%",
+      "narrative": "5대 영역 라이프 밸런스 종합 지표: 기준 82점 → 예상 82점 (+0%)"
+    },
+    {
+      "tier": "L1",
+      "label": "10일 (L1)",
+      "days": 10,
+      "scale": "단기 완충",
+      "baseline": 82,
+      "projected": 74,
+      "delta": -8,
+      "delta_label": "-8%",
+      "narrative": "5대 영역 라이프 밸런스 종합 지표: 기준 82점 → 예상 74점 (-8%)"
+    },
+    {
+      "tier": "L2",
+      "label": "100일 (L2)",
+      "days": 100,
+      "scale": "분기 습관",
+      "baseline": 82,
+      "projected": 68,
+      "delta": -14,
+      "delta_label": "-14%",
+      "narrative": "5대 영역 라이프 밸런스 종합 지표: 기준 82점 → 예상 68점 (-14%)"
+    },
+    {
+      "tier": "L3",
+      "label": "3년 (L3)",
+      "days": 1000,
+      "scale": "중기 마일스톤",
+      "baseline": 82,
+      "projected": 64,
+      "delta": -18,
+      "delta_label": "-18%",
+      "narrative": "5대 영역 라이프 밸런스 종합 지표: 기준 82점 → 예상 64점 (-18%)"
+    },
+    {
+      "tier": "L4",
+      "label": "30년 (L4)",
+      "days": 10000,
+      "scale": "인생 헌법",
+      "baseline": 82,
+      "projected": 66,
+      "delta": -16,
+      "delta_label": "-16%",
+      "narrative": "5대 영역 라이프 밸런스 종합 지표: 기준 82점 → 예상 66점 (-16%)"
+    }
+  ],
+  "ekispert_prescription": null
+}

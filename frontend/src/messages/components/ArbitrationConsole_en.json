@@ -1,0 +1,24 @@
+{
+  "ArbitrationConsole": {
+    "stanceApprove": "Approve",
+    "stanceReject": "Reject",
+    "stanceConditional": "Conditional",
+    "stanceNeutral": "Neutral",
+    "profileGuardrail": "Profile Guardrail:",
+    "dailyBudget": "Daily {budget} KRW Budget",
+    "maxWeeklyHours": "Max {hours} hrs/week",
+    "minSleepFamilyHobby": "Sleep {sleep}h · Family {family}x · Hobby {hobby}h",
+    "layer2_3Title": "Layer 2-3: Domain Council Review & Chief Governor Verdict",
+    "conflictDetected": "Cross-domain conflict detected: Conflict report generated and escalated to Chief Governor.",
+    "verdictCompleted": "Verdict Completed",
+    "reportEscalation": "▼ Escalating Conflict Report → Chief Governor Review ▼",
+    "governorVerdictTitle": "Chief Governor Verdict",
+    "verdictApprove": "Approve",
+    "verdictReject": "Reject",
+    "verdictConditional": "Conditional Revision",
+    "violation": "Violation",
+    "l2ReviewConditions": "L2 Grace Conditions",
+    "governorDrafting": "Layer 3: Chief Governor is mediating domain conflict and drafting verdict...",
+    "governorDraftingDesc": "Synthesizing Domain Council review results to determine constitution compliance and derive Pareto counter-offer."
+  }
+}

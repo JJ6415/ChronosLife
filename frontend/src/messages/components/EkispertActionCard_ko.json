@@ -1,0 +1,12 @@
+{
+  "EkispertActionCard": {
+    "title": "🚶 Layer 5: Ekispert MCP 마이크로 모빌리티 처방",
+    "before_title": "Before - 최단 환승 경로",
+    "after_title": "After - 힐링 녹지 환승 경로",
+    "method_label": "수단:",
+    "congestion_label": "혼잡도:",
+    "saved_amount_label": "💰 절약 금액: {amount}원",
+    "calories_label": "🔥 차단 칼로리: {amount}kcal",
+    "wellness_label": "🧘 웰니스 효과: {text}"
+  }
+}

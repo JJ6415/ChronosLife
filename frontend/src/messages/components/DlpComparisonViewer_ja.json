@@ -1,0 +1,11 @@
+{
+  "DlpComparisonViewer": {
+    "layer_title": "🔒 Layer 0: プライバシー・サンドボックス (Cloud DLP 匿名化)",
+    "raw_input": "原文テキスト (Raw Input)",
+    "pii_included": "⚠️ PII 含有",
+    "sanitized_text": "匿名化テキスト (Sanitized)",
+    "safe": "✅ 安全",
+    "detected_entities": "Detected Entities:",
+    "none": "None"
+  }
+}

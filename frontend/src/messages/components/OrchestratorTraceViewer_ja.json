@@ -1,0 +1,24 @@
+{
+  "OrchestratorTraceViewer": {
+    "header_title": "Layer 1: インテントオーケストレーター透明監査バックログ (Audit Trace)",
+    "header_badge": "Live Dispatched",
+    "header_desc": "上位AIオーケストレーターが発話意図を分解し、各専門エージェントに下達した実際のコンテキストプロンプトの記録です。",
+    "label_intent": "識別された議題インテント",
+    "default_intent": "📋 一般議題",
+    "label_finance_status": "財政性格判定",
+    "default_finance_status": "財政支出なし",
+    "label_engine": "オーケストレーションエンジン",
+    "default_engine": "Gemini 3.5 Flash",
+    "reasoning_title": "オーケストレーターの分解およびルーティング根拠 (Reasoning)",
+    "directives_title": "各ドメインエージェントにリアルタイムで注入されたプロンプト (Dispatched Directives)",
+    "agent_finance": "Finance Agent 下達指針",
+    "default_finance_prompt": "基本的な財政影響度および可処分所得の機会費用の評価",
+    "agent_career": "Career Agent 下達指針",
+    "default_career_prompt": "キャリア市場価値の上昇と燃え尽き症候群の危険度のトレードオフ評価",
+    "agent_wellbeing": "Wellbeing Agent 下達指針",
+    "default_wellbeing_prompt": "週3回の家族の食事、睡眠7時間、週末の趣味4時間のクオータの守護",
+    "agent_governor": "Chief Governor 仲裁ガイドライン",
+    "default_governor_prompt": "L4憲法の守護およびAI迎合の排除、パレート条件付き修正承認案の導出",
+    "btn_copy_title": "コピー"
+  }
+}

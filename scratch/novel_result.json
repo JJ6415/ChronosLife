@@ -1,0 +1,501 @@
+{
+  "id": "custom_user_query",
+  "title": "사용자 심의 안건: ⛳ 취미 및 웰니스 (제주도 골프 여행)",
+  "description": "제주도 골프 여행 비행기 및 리조트 예약 800,000원 지출",
+  "raw_input": "주말에 친구들이랑 제주도 골프 여행 가려고 80만 원 비행기랑 리조트 예약하려고 해. 지금 회사 프로젝트가 한창 바쁜데 다녀와도 될까?",
+  "dlp_sanitized": "주말에 친구 [PERSON_NAME_0] 제주도 골프 여행 가려고 80만 원 비행기랑 리조트 예약하려고 해. 지금 회사 프로젝트가 한창 바쁜데 다녀와도 될까?",
+  "detected_info_types": [
+    "PERSON_NAME"
+  ],
+  "micro_deviation": 800000.0,
+  "model_used": "gemini-3.5-flash-lite",
+  "orchestration_trace": {
+    "model_used": "gemini-3.5-flash-lite",
+    "reasoning": "본 안건은 취미 및 웰니스 활동을 위한 80만 원의 재정적 지출과 동시에, 바쁜 업무 시기와 겹치는 일정으로 인해 커리어 및 웰니스 균형 검토가 필요합니다. 따라서 Finance, Career, Wellbeing 세 도메인 간의 유기적인 종합 심의를 지시합니다.",
+    "intent_type": "HABBY_WELLNESS",
+    "intent_label": "⛳ 취미 및 웰니스 (제주도 골프 여행)",
+    "amount_description": "제주도 골프 여행 비행기 및 리조트 예약 800,000원 지출",
+    "dispatched_prompts": {
+      "finance": "80만 원 규모의 제주도 골프 여행 지출이 현재 월 예산 및 단기 재무 건전성에 미치는 영향을 분석하고, 가처분 소득 대비 적정성 평가를 수행하세요.",
+      "career": "현재 회사 프로젝트가 한창 바쁜 시기인 점을 고려하여, 골프 여행으로 인한 업무 공백 및 프로젝트 마감 리스크를 평가하고 일정 조율 가능성을 검토하세요.",
+      "wellbeing": "바쁜 업무로 인한 스트레스 해소를 위한 재충전 기회로서의 골프 여행 가치를 평가하고, 신체적·정신적 웰니스 회복 효과와 번아웃 방지 측면을 분석하세요.",
+      "chief_governor": "재정적 지출(80만 원)의 타당성과 커리어 리스크(바쁜 프로젝트), 그리고 웰니스 측면의 휴식 필요성을 종합하여 최종 승인 여부와 조건부 실행 방안을 중재하세요."
+    }
+  },
+  "dlp_result": {
+    "original": "주말에 친구들이랑 제주도 골프 여행 가려고 80만 원 비행기랑 리조트 예약하려고 해. 지금 회사 프로젝트가 한창 바쁜데 다녀와도 될까?",
+    "sanitized": "주말에 친구 [PERSON_NAME_0] 제주도 골프 여행 가려고 80만 원 비행기랑 리조트 예약하려고 해. 지금 회사 프로젝트가 한창 바쁜데 다녀와도 될까?",
+    "has_pii": true,
+    "detected_info_types": [
+      "PERSON_NAME"
+    ],
+    "transformations": [
+      {
+        "original": "들이랑",
+        "replacement": "[PERSON_NAME_0]",
+        "info_type": "PERSON_NAME"
+      }
+    ]
+  },
+  "log10_cascade": {
+    "l0_daily": {
+      "budget_drain_pct": 2000.0,
+      "status": "CRITICAL",
+      "message": "일일 예산의 2000.0%를 소진합니다."
+    },
+    "l1_sprint": {
+      "sprint_budget": 400000.0,
+      "sprint_absorb": 2.0,
+      "remedy": "다음 3일간 일일 가처분 한도를 266,667원씩 자동 차감",
+      "message": "10일 스프린트 예산 대비 200.0%에 해당합니다."
+    },
+    "l2_quarter": {
+      "quarterly_reserve": 3000000.0,
+      "slippage": 26.666666666666668,
+      "status": "DANGER",
+      "message": "분기 예비비의 26.67%가 잠식됩니다."
+    },
+    "l3_chapter": {
+      "future_loss_1000d": 942920.3172085403,
+      "message": "3년 후 복리 기회비용은 942,920원입니다."
+    },
+    "l4_constitution": {
+      "compound_loss": 4291852.172571605,
+      "delayed_days": 57.22469563428807,
+      "message": "은퇴 시점에서의 자산 손실은 4,291,852원이며, 은퇴가 57.2일 지연됩니다."
+    },
+    "summary_verdict": "현재의 800,000원 지출은 일일 예산의 2000.0%를 차지하며, L1 스프린트를 방어하려면 다음 3일간 일일 가처분 한도를 266,667원씩 자동 차감해야 합니다. 장기적으로는 28년 후 은퇴를 57.2일 지연시키는 결과를 초래합니다."
+  },
+  "council_verdict": {
+    "finance": {
+      "stance": "reject",
+      "reasoning": "80만 원의 지출은 일일 예산의 2000%를 소진하며 분기 예비비의 26.67%를 잠식합니다. 장기 복리 기회비용을 고려할 때 단기 재무 건전성에 심각한 타격을 줍니다.",
+      "metrics": {
+        "budget_drain_pct": 2000.0,
+        "status": "CRITICAL",
+        "slippage_quarter_pct": 26.67,
+        "retirement_delay_days": 57.2
+      }
+    },
+    "career": {
+      "stance": "conditional",
+      "reasoning": "현재 프로젝트가 한창 바쁜 시기이므로 무단 이탈은 마감 리스크를 급격히 높입니다. 사전에 이해관계자와 일정을 조율하고 업무 공백을 완벽히 메울 수 있는 플랜이 선행되어야 합니다.",
+      "metrics": {
+        "project_risk": "HIGH",
+        "workload_status": "PEAK",
+        "condition": "사전 마감 완료 및 대체 일정 조율 필수"
+      }
+    },
+    "wellbeing": {
+      "stance": "approve",
+      "reasoning": "고강도 업무로 인한 번아웃을 방지하고 신체적·정신적 웰니스를 회복하기 위한 리프레시 기회로서 골프 여행은 긍정적 가치를 지닙니다.",
+      "metrics": {
+        "burnout_prevention": "HIGH",
+        "recovery_value": "EXCELLENT"
+      }
+    },
+    "model_used": "gemini-3.5-flash-lite"
+  },
+  "governor_ruling": {
+    "decision": "조건부수정",
+    "violated_tenets": [
+      "제2조",
+      "제4조",
+      "제5조"
+    ],
+    "reasoning": "80만 원의 즉흥적 지출은 단기 재무 완충재를 초과하며 30년 은퇴 자산 목표에 부정적인 영향을 미칩니다. 또한 현재 프로젝트가 바쁜 시기임에도 L2 유예기간과 사전 조율 없이 진행되는 것은 L4 헌법 제5조에 위배됩니다. 다만 웰니스 위원회의 의견을 반영하여 여행 자체를 기각하는 대신 재무적 타격을 줄이고 업무 일정을 조율하는 카운터오퍼를 제시합니다.",
+    "pareto_counter_offer": "항공권과 리조트 예약 비용을 30만 원 이하로 낮추거나, L1 완충재 내에서 소화 가능한 예산으로 조정하고, 현재 프로젝트의 마감 일정을 완벽히 소화한 뒤 대체 주말로 일정을 연기하여 진행할 것을 권고합니다.",
+    "l2_review_conditions": "1. 현재 진행 중인 프로젝트의 마감 일정을 사전에 완벽히 조율 완료할 것. 2. 지출 예산을 30만 원 이하로 축소하거나 L1 완충재 10일 내에서 무리 없이 흡수 가능한 재원 마련. 3. 최소 14일 이상의 유예기간(L2)을 거쳐 업무 공백 리스크를 해소한 후 최종 확정.",
+    "model_used": "gemini-3.5-flash-lite"
+  },
+  "goal_impacts": [
+    {
+      "category_id": "finance",
+      "name": "재정",
+      "icon": "💰",
+      "score": -80,
+      "status": "NEGATIVE",
+      "reason": "일일 한도 초과(800,000원). L1 완충재 잠식 및 30년 복리 기회비용 발생",
+      "delta_label": "-80%",
+      "temporal_trajectory": [
+        {
+          "tier": "L0",
+          "label": "1일 (L0)",
+          "days": 1,
+          "scale": "일일 즉각",
+          "baseline": 80,
+          "projected": 45,
+          "delta": -35,
+          "delta_label": "-35%",
+          "narrative": "일일 가처분 4만 원 한도 초과 (-800,000원)"
+        },
+        {
+          "tier": "L1",
+          "label": "10일 (L1)",
+          "days": 10,
+          "scale": "단기 완충",
+          "baseline": 80,
+          "projected": 52,
+          "delta": -28,
+          "delta_label": "-28%",
+          "narrative": "10일 완충재 긴급 차감 및 가처분 축소"
+        },
+        {
+          "tier": "L2",
+          "label": "100일 (L2)",
+          "days": 100,
+          "scale": "분기 습관",
+          "baseline": 80,
+          "projected": 63,
+          "delta": -17,
+          "delta_label": "-17%",
+          "narrative": "분기 저축률 소폭 저하"
+        },
+        {
+          "tier": "L3",
+          "label": "3년 (L3)",
+          "days": 1000,
+          "scale": "중기 마일스톤",
+          "baseline": 80,
+          "projected": 70,
+          "delta": -10,
+          "delta_label": "-10%",
+          "narrative": "중기 시드머니 형성 속도 둔화"
+        },
+        {
+          "tier": "L4",
+          "label": "30년 (L4)",
+          "days": 10000,
+          "scale": "인생 헌법",
+          "baseline": 80,
+          "projected": 59,
+          "delta": -21,
+          "delta_label": "-21%",
+          "narrative": "30년 복리 기회비용 잠식 (은퇴 지연 리스크)"
+        }
+      ]
+    },
+    {
+      "category_id": "career",
+      "name": "커리어",
+      "icon": "📈",
+      "score": 35,
+      "status": "POSITIVE",
+      "reason": "시장 가치 재평가 및 새로운 기술 도메인 역량 확장 기회",
+      "delta_label": "+35%",
+      "temporal_trajectory": [
+        {
+          "tier": "L0",
+          "label": "1일 (L0)",
+          "days": 1,
+          "scale": "일일 즉각",
+          "baseline": 75,
+          "projected": 75,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "현 직무 상태 유지"
+        },
+        {
+          "tier": "L1",
+          "label": "10일 (L1)",
+          "days": 10,
+          "scale": "단기 완충",
+          "baseline": 75,
+          "projected": 75,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "단기 변동 없음"
+        },
+        {
+          "tier": "L2",
+          "label": "100일 (L2)",
+          "days": 100,
+          "scale": "분기 습관",
+          "baseline": 75,
+          "projected": 75,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "분기 마일스톤 유지"
+        },
+        {
+          "tier": "L3",
+          "label": "3년 (L3)",
+          "days": 1000,
+          "scale": "중기 마일스톤",
+          "baseline": 75,
+          "projected": 75,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "중기 궤적 안정"
+        },
+        {
+          "tier": "L4",
+          "label": "30년 (L4)",
+          "days": 10000,
+          "scale": "인생 헌법",
+          "baseline": 75,
+          "projected": 75,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "장기 목표 유지"
+        }
+      ]
+    },
+    {
+      "category_id": "health",
+      "name": "건강",
+      "icon": "🏃",
+      "score": -5,
+      "status": "NEUTRAL",
+      "reason": "신체 항상성 상태 유지",
+      "delta_label": "-5%",
+      "temporal_trajectory": [
+        {
+          "tier": "L0",
+          "label": "1일 (L0)",
+          "days": 1,
+          "scale": "일일 즉각",
+          "baseline": 85,
+          "projected": 85,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "생체 신호 평형 유지"
+        },
+        {
+          "tier": "L1",
+          "label": "10일 (L1)",
+          "days": 10,
+          "scale": "단기 완충",
+          "baseline": 85,
+          "projected": 85,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "단기 피로도 정상"
+        },
+        {
+          "tier": "L2",
+          "label": "100일 (L2)",
+          "days": 100,
+          "scale": "분기 습관",
+          "baseline": 85,
+          "projected": 85,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "분기 건강 지표 안정"
+        },
+        {
+          "tier": "L3",
+          "label": "3년 (L3)",
+          "days": 1000,
+          "scale": "중기 마일스톤",
+          "baseline": 85,
+          "projected": 85,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "중기 체력 유지"
+        },
+        {
+          "tier": "L4",
+          "label": "30년 (L4)",
+          "days": 10000,
+          "scale": "인생 헌법",
+          "baseline": 85,
+          "projected": 85,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "30년 건강 궤적 순항"
+        }
+      ]
+    },
+    {
+      "category_id": "family",
+      "name": "가족",
+      "icon": "👨‍👩‍👧",
+      "score": 0,
+      "status": "NEUTRAL",
+      "reason": "가족 일정에 유의미한 영향 없음",
+      "delta_label": "+0%",
+      "temporal_trajectory": [
+        {
+          "tier": "L0",
+          "label": "1일 (L0)",
+          "days": 1,
+          "scale": "일일 즉각",
+          "baseline": 90,
+          "projected": 90,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "가족 일정 정상"
+        },
+        {
+          "tier": "L1",
+          "label": "10일 (L1)",
+          "days": 10,
+          "scale": "단기 완충",
+          "baseline": 90,
+          "projected": 90,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "단기 교감 유지"
+        },
+        {
+          "tier": "L2",
+          "label": "100일 (L2)",
+          "days": 100,
+          "scale": "분기 습관",
+          "baseline": 90,
+          "projected": 90,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "분기 가족 루틴 순항"
+        },
+        {
+          "tier": "L3",
+          "label": "3년 (L3)",
+          "days": 1000,
+          "scale": "중기 마일스톤",
+          "baseline": 90,
+          "projected": 90,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "중기 라이프사이클 안정"
+        },
+        {
+          "tier": "L4",
+          "label": "30년 (L4)",
+          "days": 10000,
+          "scale": "인생 헌법",
+          "baseline": 90,
+          "projected": 90,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "장기 헌법 준수"
+        }
+      ]
+    },
+    {
+      "category_id": "hobby",
+      "name": "개인 취미",
+      "icon": "🎨",
+      "score": 0,
+      "status": "NEUTRAL",
+      "reason": "취미 쿼터 유지",
+      "delta_label": "+0%",
+      "temporal_trajectory": [
+        {
+          "tier": "L0",
+          "label": "1일 (L0)",
+          "days": 1,
+          "scale": "일일 즉각",
+          "baseline": 80,
+          "projected": 80,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "취미 루틴 유지"
+        },
+        {
+          "tier": "L1",
+          "label": "10일 (L1)",
+          "days": 10,
+          "scale": "단기 완충",
+          "baseline": 80,
+          "projected": 80,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "단기 블록 확보"
+        },
+        {
+          "tier": "L2",
+          "label": "100일 (L2)",
+          "days": 100,
+          "scale": "분기 습관",
+          "baseline": 80,
+          "projected": 80,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "분기 쿼터 정상"
+        },
+        {
+          "tier": "L3",
+          "label": "3년 (L3)",
+          "days": 1000,
+          "scale": "중기 마일스톤",
+          "baseline": 80,
+          "projected": 80,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "중기 취미 생활 안정"
+        },
+        {
+          "tier": "L4",
+          "label": "30년 (L4)",
+          "days": 10000,
+          "scale": "인생 헌법",
+          "baseline": 80,
+          "projected": 80,
+          "delta": 0,
+          "delta_label": "+0%",
+          "narrative": "평생 여가 지속"
+        }
+      ]
+    }
+  ],
+  "composite_trajectory": [
+    {
+      "tier": "L0",
+      "label": "1일 (L0)",
+      "days": 1,
+      "scale": "일일 즉각",
+      "baseline": 82,
+      "projected": 75,
+      "delta": -7,
+      "delta_label": "-7%",
+      "narrative": "5대 영역 라이프 밸런스 종합 지표: 기준 82점 → 예상 75점 (-7%)"
+    },
+    {
+      "tier": "L1",
+      "label": "10일 (L1)",
+      "days": 10,
+      "scale": "단기 완충",
+      "baseline": 82,
+      "projected": 76,
+      "delta": -6,
+      "delta_label": "-6%",
+      "narrative": "5대 영역 라이프 밸런스 종합 지표: 기준 82점 → 예상 76점 (-6%)"
+    },
+    {
+      "tier": "L2",
+      "label": "100일 (L2)",
+      "days": 100,
+      "scale": "분기 습관",
+      "baseline": 82,
+      "projected": 78,
+      "delta": -4,
+      "delta_label": "-4%",
+      "narrative": "5대 영역 라이프 밸런스 종합 지표: 기준 82점 → 예상 78점 (-4%)"
+    },
+    {
+      "tier": "L3",
+      "label": "3년 (L3)",
+      "days": 1000,
+      "scale": "중기 마일스톤",
+      "baseline": 82,
+      "projected": 80,
+      "delta": -2,
+      "delta_label": "-2%",
+      "narrative": "5대 영역 라이프 밸런스 종합 지표: 기준 82점 → 예상 80점 (-2%)"
+    },
+    {
+      "tier": "L4",
+      "label": "30년 (L4)",
+      "days": 10000,
+      "scale": "인생 헌법",
+      "baseline": 82,
+      "projected": 77,
+      "delta": -5,
+      "delta_label": "-5%",
+      "narrative": "5대 영역 라이프 밸런스 종합 지표: 기준 82점 → 예상 77점 (-5%)"
+    }
+  ],
+  "ekispert_prescription": null
+}

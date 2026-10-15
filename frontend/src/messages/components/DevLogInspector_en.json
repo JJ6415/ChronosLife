@@ -1,0 +1,27 @@
+{
+  "DevLogInspector": {
+    "confirmClearLogs": "Are you sure you want to clear all developer logs?",
+    "apiLogsLabel": "API Logs",
+    "title": "🛠️ Developer API & LLM Live Inspector",
+    "subtitle": "Check all API inputs and outputs, Gemini prompts and raw responses in real-time.",
+    "autoRefreshToggle": "Toggle 2-second auto-refresh",
+    "liveUpdate": "Live Update",
+    "manualRefresh": "Manual Refresh",
+    "clearLogs": "Clear Logs",
+    "close": "Close",
+    "tabHttpApi": "HTTP API Request/Response",
+    "tabGeminiLlm": "Gemini AI Model Calls",
+    "searchPlaceholder": "URL, intent, keyword filter...",
+    "noApiLogs": "No HTTP API requests recorded.",
+    "requestPayload": "📥 Input (Request Payload)",
+    "copied": "Copied",
+    "copy": "Copy",
+    "empty": "(Empty)",
+    "responsePayload": "📤 Output (Response Payload)",
+    "errorLogPrefix": "⚠️ Error Log: ",
+    "noLlmLogs": "No Gemini AI model calls recorded.",
+    "promptLengthInfo": "(Input: {input} chars / Output: {output} chars)",
+    "promptFull": "📝 Full Prompt sent to Gemini",
+    "responseFull": "🤖 Gemini Raw Response"
+  }
+}

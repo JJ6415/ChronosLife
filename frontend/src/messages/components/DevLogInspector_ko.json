@@ -1,0 +1,27 @@
+{
+  "DevLogInspector": {
+    "confirmClearLogs": "개발자 로그를 모두 초기화하시겠습니까?",
+    "apiLogsLabel": "API 로그",
+    "title": "🛠️ 개발자 API & LLM 실시간 인스펙터",
+    "subtitle": "모든 API 요청값(Input)과 응답값(Output), Gemini 프롬프트 및 원본 응답을 실시간으로 확인합니다.",
+    "autoRefreshToggle": "2초 주기 자동 새로고침 토글",
+    "liveUpdate": "실시간 갱신",
+    "manualRefresh": "수동 새로고침",
+    "clearLogs": "로그 비우기",
+    "close": "닫기",
+    "tabHttpApi": "HTTP API 요청/응답",
+    "tabGeminiLlm": "Gemini AI 모델 호출",
+    "searchPlaceholder": "URL, 인텐트, 키워드 필터...",
+    "noApiLogs": "기록된 HTTP API 요청이 없습니다.",
+    "requestPayload": "📥 입력값 (Request Payload)",
+    "copied": "복사됨",
+    "copy": "복사",
+    "empty": "(Empty)",
+    "responsePayload": "📤 출력값 (Response Payload)",
+    "errorLogPrefix": "⚠️ 에러 로그: ",
+    "noLlmLogs": "기록된 Gemini AI 모델 호출이 없습니다.",
+    "promptLengthInfo": "(입력: {input}자 / 출력: {output}자)",
+    "promptFull": "📝 Gemini에 전송된 프롬프트 전문",
+    "responseFull": "🤖 Gemini 원본 응답 내용"
+  }
+}
