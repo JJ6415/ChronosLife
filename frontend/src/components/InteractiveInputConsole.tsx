@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Send, Sparkles, RotateCcw, Cpu, Settings2, RefreshCw } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 export interface ModelOption {
   id: string;
@@ -32,6 +32,7 @@ export default function InteractiveInputConsole({
   initialText = ""
 }: InteractiveInputConsoleProps) {
   const t = useTranslations('Console');
+  const locale = useLocale();
   const [text, setText] = useState(initialText);
   const [customAmount, setCustomAmount] = useState<number | ''>('');
   const [selectedModel, setSelectedModel] = useState<string>('gemini-3.5-flash-lite');
@@ -40,10 +41,10 @@ export default function InteractiveInputConsole({
 
   const TEMPLATES = [
     { label: t('template_1_label'), text: t('template_1_text'), amount: 0 },
-    { label: t('template_2_label'), text: t('template_2_text'), amount: 98000 },
-    { label: t('template_3_label'), text: t('template_3_text'), amount: 30000 },
-    { label: t('template_4_label'), text: t('template_4_text'), amount: 250000 },
-    { label: t('template_5_label'), text: t('template_5_text'), amount: 50000 }
+    { label: t('template_2_label'), text: t('template_2_text'), amount: locale === 'ja' ? 9800 : 98000 },
+    { label: t('template_3_label'), text: t('template_3_text'), amount: locale === 'ja' ? 3000 : 30000 },
+    { label: t('template_4_label'), text: t('template_4_text'), amount: locale === 'ja' ? 25000 : 250000 },
+    { label: t('template_5_label'), text: t('template_5_text'), amount: locale === 'ja' ? 5000 : 50000 }
   ];
 
   const fetchDynamicModels = async (forceRefresh = false) => {

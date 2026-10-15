@@ -156,6 +156,7 @@ export default function Log10ComicStripViewer({ comic }: Log10ComicStripViewerPr
 
   const [selectedPanel, setSelectedPanel] = useState<ComicCut | null>(null);
   const [panelImages, setPanelImages] = useState<Record<number, string>>({});
+  const [failedImages, setFailedImages] = useState<Record<number, boolean>>({});
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingPanelNum, setGeneratingPanelNum] = useState<number | null>(null);
   const [isBatchGenerating, setIsBatchGenerating] = useState(false);
@@ -317,7 +318,7 @@ export default function Log10ComicStripViewer({ comic }: Log10ComicStripViewerPr
       {/* 웹툰 5컷 스트립 패널 그리드 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 relative z-10">
         {comic.cuts.map((cut, idx) => {
-          const currentImg = panelImages[cut.panel_number] || cut.image_url;
+          const currentImg = !failedImages[cut.panel_number] ? (panelImages[cut.panel_number] || cut.image_url) : null;
           const isCurrentGenerating = generatingPanelNum === cut.panel_number;
 
           return (
@@ -354,6 +355,7 @@ export default function Log10ComicStripViewer({ comic }: Log10ComicStripViewerPr
                       src={currentImg} 
                       alt={cut.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={() => setFailedImages(prev => ({ ...prev, [cut.panel_number]: true }))}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
                     <div className="absolute top-2 right-2 text-lg bg-black/60 backdrop-blur-md rounded-full w-7 h-7 flex items-center justify-center border border-white/20 shadow-md">
@@ -458,7 +460,7 @@ export default function Log10ComicStripViewer({ comic }: Log10ComicStripViewerPr
       {/* 모달: 선택 컷 상세 확대 보기 (createPortal로 최상위 document.body에 렌더링하여 컨테이너 overflow 트랩 해소) */}
       {mounted && selectedPanel && createPortal(
         (() => {
-          const modalImg = panelImages[selectedPanel.panel_number] || selectedPanel.image_url;
+          const modalImg = selectedPanel && !failedImages[selectedPanel.panel_number] ? (panelImages[selectedPanel.panel_number] || selectedPanel.image_url) : null;
           return (
             <div 
               onClick={(e) => { if (e.target === e.currentTarget) setSelectedPanel(null); }}
@@ -494,6 +496,7 @@ export default function Log10ComicStripViewer({ comic }: Log10ComicStripViewerPr
                         src={modalImg} 
                         alt={selectedPanel.title}
                         className="w-full h-full object-cover"
+                        onError={() => selectedPanel && setFailedImages(prev => ({ ...prev, [selectedPanel.panel_number]: true }))}
                       />
                       <div className="absolute top-3 right-3 text-2xl drop-shadow-lg bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center border border-white/30 shadow-md">
                         {selectedPanel.emotion}

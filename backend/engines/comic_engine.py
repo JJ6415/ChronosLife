@@ -103,10 +103,14 @@ class Log10ComicEngine:
                 except Exception:
                     pass
 
+                # 브라우저에서 서버 간 도메인 격차 및 404 없이 즉시 렌더링되도록 Data URL로 반환
+                b64_str = getattr(interaction.output_image, "data", None)
+                data_url = f"data:image/png;base64,{b64_str}" if b64_str else f"/comics/{target_filename}"
+
                 logger.info(f"Successfully generated and saved panel {panel_num} via Interactions API to {target_filepath}")
                 return {
                     "status": "ok",
-                    "image_url": f"/comics/{target_filename}",
+                    "image_url": data_url,
                     "is_ai_generated": True,
                     "message": "AI 이미지 실시간 생성 성공 (gemini-3.1-flash-image)"
                 }
