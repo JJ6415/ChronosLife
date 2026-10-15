@@ -66,9 +66,12 @@ class StateDynamicsEngine:
         if current_input_work_hours >= 10.0:
             consecutive_overwork_days += 1
 
-        # 번아웃 지수 산출 (시그모이드 누적)
-        raw_fatigue = (total_sleep_debt * 0.15) + (consecutive_overwork_days * 0.25)
-        burnout_index = round(min(1.0, 1.0 / (1.0 + math.exp(-2.0 * (raw_fatigue - 0.8)))), 2)
+        # 번아웃 지수 산출 (피로 누적과 연속 야근이 0이면 0.0 완전 초기화)
+        if total_sleep_debt <= 0.01 and consecutive_overwork_days == 0:
+            burnout_index = 0.0
+        else:
+            raw_fatigue = (total_sleep_debt * 0.15) + (consecutive_overwork_days * 0.25)
+            burnout_index = round(min(1.0, 1.0 / (1.0 + math.exp(-2.0 * (raw_fatigue - 0.8)))), 2)
 
         # 3. 가족 및 취미 쿼터 이행률
         total_hobby_mins = sum(d.hobby_minutes for d in history_window)

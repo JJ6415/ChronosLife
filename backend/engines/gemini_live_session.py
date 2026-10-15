@@ -149,11 +149,8 @@ class GeminiLiveBridge:
                                 user_text = payload.get("text", "")
                                 if user_text:
                                     logger.info(f"Sending text to Gemini Live: {user_text}")
-                                    # Google GenAI SDK: send_client_content with turn_complete=True triggers Gemini's response
-                                    await session.send_client_content(
-                                        turns=[types.Content(parts=[types.Part.from_text(text=user_text)])],
-                                        turn_complete=True
-                                    )
+                                    # Google GenAI SDK: session.send with end_of_turn=True triggers Gemini's response
+                                    await session.send(input=user_text, end_of_turn=True)
 
                             elif msg_type == "audio_pcm":
                                 # Base64 인코딩된 16kHz 16비트 PCM 바이트

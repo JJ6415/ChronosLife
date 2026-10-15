@@ -67,15 +67,15 @@ export default function LifeVitalRadar({
   const [activePreset, setActivePreset] = useState<'burnout' | 'balanced' | 'frugal' | 'baseline' | 'custom' | null>('baseline');
   const [isManualTuningOpen, setIsManualTuningOpen] = useState(false);
   const [customSliders, setCustomSliders] = useState({
-    budget_drain_pct: 87.5,
-    burnout_index: 78.0,
-    sleep_debt_hours: 6.5,
-    consecutive_overwork_days: 3,
-    weekly_hobby_minutes: 90,
-    weekly_family_dinners: 1
+    budget_drain_pct: 0,
+    burnout_index: 0,
+    sleep_debt_hours: 0,
+    consecutive_overwork_days: 0,
+    weekly_hobby_minutes: 0,
+    weekly_family_dinners: 0
   });
 
-  // 대화 및 심의 이벤트로부터 최신 라이프 상태 유입 시 즉각 동기화
+  // 대화 및 심의 이벤트로부터 최신 라이프 상태 유입 시 동기화
   useEffect(() => {
     if (propStateData) {
       setInternalState(propStateData);
@@ -138,38 +138,44 @@ export default function LifeVitalRadar({
       }
     } catch (e) {
       console.warn('Failed to fetch /api/state/current:', e);
-      if (!internalState) {
+      if (forceReset || !internalState) {
+        // 완전 초기화 폴백: 모든 수치 0
+        const zeroMetrics: VitalMetrics = {
+          budget_drain_pct: 0,
+          burnout_index: 0,
+          sleep_debt_hours: 0,
+          consecutive_overwork_days: 0,
+          weekly_hobby_minutes: 0,
+          weekly_family_dinners: 0
+        };
+        const zeroHistory = ['10-08', '10-09', '10-10', '10-11', '10-12', '10-13', '10-14'].map(date => ({
+          date,
+          expense_total: 0,
+          sleep_hours: 7.5,
+          work_hours: 0,
+          family_dinner: false,
+          hobby_minutes: 0
+        }));
         setInternalState({
-          metrics: {
-            budget_drain_pct: 87.5,
-            burnout_index: 78.0,
-            sleep_debt_hours: 6.5,
-            consecutive_overwork_days: 3,
-            weekly_hobby_minutes: 90,
-            weekly_family_dinners: 1
-          },
-          anomaly_triggers: ["CRITICAL_BURNOUT_ACCUMULATED", "WEEKLY_BUDGET_ALMOST_EXHAUSTED", "CONSECUTIVE_OVERWORK_TIRED_BRAIN"],
-          context_summary_for_council: "최근 7일간 누적 분석: 주간 예산 소진율 87.5%, 수면 부채 6.5시간, 번아웃 지수 78.0 (연속 고강도 근무 3일째)."
+          metrics: zeroMetrics,
+          anomaly_triggers: [],
+          context_summary_for_council: locale === 'ja'
+            ? '直近7日間の全バイタル初期化完了 (予算消化率 0%、睡眠負債 0時間、バーンアウト指数 0)。'
+            : '최근 7일간 전체 바이탈 초기화 완료 (예산 소진율 0%, 수면 부채 0시간, 번아웃 지수 0).'
         });
-        setInternalHistory([
-          { date: '09-28', expense_total: 12000, sleep_hours: 7.5, work_hours: 8.0, family_dinner: true, hobby_minutes: 60 },
-          { date: '09-29', expense_total: 25000, sleep_hours: 7.0, work_hours: 8.5, family_dinner: false, hobby_minutes: 30 },
-          { date: '09-30', expense_total: 18000, sleep_hours: 6.5, work_hours: 9.0, family_dinner: false, hobby_minutes: 0 },
-          { date: '10-01', expense_total: 45000, sleep_hours: 6.0, work_hours: 10.5, family_dinner: false, hobby_minutes: 0 },
-          { date: '10-02', expense_total: 35000, sleep_hours: 5.5, work_hours: 11.0, family_dinner: false, hobby_minutes: 0 },
-          { date: '10-03', expense_total: 60000, sleep_hours: 5.0, work_hours: 12.0, family_dinner: false, hobby_minutes: 0 },
-          { date: '10-04', expense_total: 50000, sleep_hours: 5.2, work_hours: 11.5, family_dinner: false, hobby_minutes: 0 }
-        ]);
+        setInternalHistory(zeroHistory);
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 1. 프리셋 적용 핸들러
+  // 1. 프리셋 적용 핸들러 (과거 1주일 궤적과 메트릭스를 즉각 교체)
   const handleApplyPreset = async (presetId: 'burnout' | 'balanced' | 'frugal') => {
     setIsLoading(true);
     setActivePreset(presetId);
+    setHasLiveUpdate(true);
+
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
       const res = await fetch(`${apiUrl}/api/state/preset`, {
@@ -197,10 +203,74 @@ export default function LifeVitalRadar({
         if (json.history_window) {
           setInternalHistory(json.history_window);
         }
-        setHasLiveUpdate(true);
       }
     } catch (e) {
-      console.warn('Failed to apply preset:', e);
+      console.warn('Failed to apply preset, applying client-side preset fallback:', e);
+      const dates = ['10-08', '10-09', '10-10', '10-11', '10-12', '10-13', '10-14'];
+      if (presetId === 'burnout') {
+        setInternalState({
+          metrics: {
+            budget_drain_pct: 128.2,
+            burnout_index: 99.0,
+            sleep_debt_hours: 11.2,
+            consecutive_overwork_days: 7,
+            weekly_hobby_minutes: 0,
+            weekly_family_dinners: 0
+          },
+          anomaly_triggers: ["CRITICAL_BURNOUT_ACCUMULATED", "CONSECUTIVE_OVERWORK_TIRED_BRAIN"],
+          context_summary_for_council: "過去7日間の累積分析: 週間予算消化率 128.2%、睡眠負債 11.2時間、バーンアウト指数 99.0。"
+        });
+        setInternalHistory(dates.map((d, i) => ({
+          date: d,
+          expense_total: 45000 + i * 4000,
+          sleep_hours: Math.max(4.5, 6.0 - i * 0.25),
+          work_hours: 10.0 + i * 0.5,
+          family_dinner: false,
+          hobby_minutes: 0
+        })));
+      } else if (presetId === 'balanced') {
+        setInternalState({
+          metrics: {
+            budget_drain_pct: 45.0,
+            burnout_index: 17.0,
+            sleep_debt_hours: 0.0,
+            consecutive_overwork_days: 0,
+            weekly_hobby_minutes: 240,
+            weekly_family_dinners: 4
+          },
+          anomaly_triggers: [],
+          context_summary_for_council: "過去7日間の累積分析: 週間予算消化率 45.0%、睡眠負債 0.0時間、バーンアウト指数 17.0。"
+        });
+        setInternalHistory(dates.map((d, i) => ({
+          date: d,
+          expense_total: 18000,
+          sleep_hours: 7.5,
+          work_hours: i < 5 ? 8.0 : 0.0,
+          family_dinner: i % 2 === 0,
+          hobby_minutes: i < 5 ? 30 : 60
+        })));
+      } else {
+        setInternalState({
+          metrics: {
+            budget_drain_pct: 17.5,
+            burnout_index: 17.0,
+            sleep_debt_hours: 0.0,
+            consecutive_overwork_days: 0,
+            weekly_hobby_minutes: 120,
+            weekly_family_dinners: 3
+          },
+          anomaly_triggers: [],
+          context_summary_for_council: "過去7日間の累積分析: 週間予算消化率 17.5%、睡眠負債 0.0時間、バーンアウト指数 17.0。"
+        });
+        setInternalHistory(dates.map((d, i) => ({
+          date: d,
+          expense_total: 7000,
+          sleep_hours: 7.4,
+          work_hours: i < 5 ? 8.2 : 0.0,
+          family_dinner: i % 3 === 0,
+          hobby_minutes: 20
+        })));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -210,6 +280,8 @@ export default function LifeVitalRadar({
   const handleApplyCustomState = async () => {
     setIsLoading(true);
     setActivePreset('custom');
+    setHasLiveUpdate(true);
+
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
       const res = await fetch(`${apiUrl}/api/state/custom`, {
@@ -228,11 +300,9 @@ export default function LifeVitalRadar({
         if (json.history_window) {
           setInternalHistory(json.history_window);
         }
-        setHasLiveUpdate(true);
       }
     } catch (e) {
       console.warn('Failed to apply custom state:', e);
-      // 오프라인 클라이언트 즉시 반영
       setInternalState(prev => prev ? ({
         ...prev,
         metrics: {
@@ -240,15 +310,65 @@ export default function LifeVitalRadar({
           ...customSliders
         }
       }) : null);
-      setHasLiveUpdate(true);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 3. 초기화 핸들러
+  // 3. 초기화 핸들러: 모든 메트릭스 및 7일 궤적을 0(완전 초기화)으로 리셋!
   const handleResetToBaseline = async () => {
-    await fetchCurrentState(true);
+    setIsLoading(true);
+    setActivePreset('baseline');
+    setIsManualTuningOpen(false);
+
+    // 클라이언트 상태 즉각 완전 0 리셋
+    const zeroMetrics: VitalMetrics = {
+      budget_drain_pct: 0.0,
+      burnout_index: 0.0,
+      sleep_debt_hours: 0.0,
+      consecutive_overwork_days: 0,
+      weekly_hobby_minutes: 0,
+      weekly_family_dinners: 0
+    };
+
+    const dates = ['10-08', '10-09', '10-10', '10-11', '10-12', '10-13', '10-14'];
+    const zeroHistory: VitalHistoryItem[] = dates.map(d => ({
+      date: d,
+      expense_total: 0.0,
+      sleep_hours: 7.5,
+      work_hours: 0.0,
+      family_dinner: false,
+      hobby_minutes: 0
+    }));
+
+    setCustomSliders({
+      budget_drain_pct: 0,
+      burnout_index: 0,
+      sleep_debt_hours: 0,
+      consecutive_overwork_days: 0,
+      weekly_hobby_minutes: 0,
+      weekly_family_dinners: 0
+    });
+
+    setInternalState({
+      metrics: zeroMetrics,
+      anomaly_triggers: [],
+      context_summary_for_council: locale === 'ja'
+        ? '直近7日間の全バイタル初期化完了 (予算消化率 0%、睡眠負債 0時間、バーンアウト指数 0)。'
+        : '최근 7일간 전체 바이탈 초기화 완료 (예산 소진율 0%, 수면 부채 0시간, 번아웃 지수 0).'
+    });
+    setInternalHistory(zeroHistory);
+    setHasLiveUpdate(false);
+
+    // 백엔드 동기화
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+      await fetch(`${apiUrl}/api/state/reset?locale=${locale}`, { method: 'POST' });
+    } catch (e) {
+      console.warn('Backend reset sync:', e);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -257,8 +377,9 @@ export default function LifeVitalRadar({
     }
   }, [locale]);
 
-  const activeState = propStateData || internalState;
-  const activeHistory = (propHistory && propHistory.length > 0) ? propHistory : internalHistory;
+  // CRITICAL FIX: 사용자가 프리셋/초기화/직접 수정을 조작한 경우 internalState와 internalHistory를 절대적 우선순위로 적용!
+  const activeState = internalState || propStateData;
+  const activeHistory = (internalHistory && internalHistory.length > 0) ? internalHistory : (propHistory || []);
 
   if (!activeState) return null;
 
@@ -367,15 +488,15 @@ export default function LifeVitalRadar({
             <span>{t('btnManualTuning')}</span>
           </button>
 
-          {/* 초기화 버튼 */}
+          {/* 초기화 버튼 (모든 바이탈 0 리셋) */}
           <button
             type="button"
             onClick={handleResetToBaseline}
             disabled={isLoading || isUpdating}
-            className="px-2 py-1 rounded-lg text-[11px] font-bold transition-all shadow-sm flex items-center gap-1 active:scale-95 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600/60"
-            title={t('refreshVital')}
+            className="px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shadow-sm flex items-center gap-1 active:scale-95 bg-slate-800 hover:bg-slate-700 text-rose-300 hover:text-white border border-rose-500/30 hover:border-rose-400"
+            title="모든 바이탈 지수를 0(완전 초기화)으로 리셋"
           >
-            <RotateCcw className={`w-3 h-3 ${isLoading ? 'animate-spin text-indigo-400' : 'text-slate-400'}`} />
+            <RotateCcw className={`w-3 h-3 ${isLoading ? 'animate-spin text-rose-400' : 'text-rose-400'}`} />
             <span>{t('btnReset')}</span>
           </button>
 
@@ -421,7 +542,7 @@ export default function LifeVitalRadar({
               </div>
               <input
                 type="range"
-                min="5"
+                min="0"
                 max="150"
                 step="1"
                 value={customSliders.budget_drain_pct}
@@ -581,10 +702,11 @@ export default function LifeVitalRadar({
         </div>
       )}
 
-      {/* ── 5. 펼쳐졌을 때의 4대 바이탈 카드 & 마이크로 스파크라인 그리드 ── */}
+      {/* ── 5. 펼쳐졌을 때의 4대 바이탈 카드 & 과거 1주일간의 궤적 그리드 ── */}
       {!isCollapsed && (
         <div className="p-4 sm:p-5 space-y-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            
             {/* 카드 1: 번아웃 지수 */}
             <div className={`p-3.5 rounded-xl border transition-all ${
               isBurnoutSevere 
@@ -608,23 +730,38 @@ export default function LifeVitalRadar({
               <p className="text-[11px] text-slate-400 mb-2 truncate">
                 {t('consecutiveOverwork')} <strong className="text-slate-200">{m.consecutive_overwork_days}{t('days')}</strong>
               </p>
-              {/* 스파크라인: 7일 근무시간 / 스트레스 강도 */}
-              <div className="h-7 flex items-end gap-1 pt-1 border-t border-slate-700/40">
-                {activeHistory.map((h, i) => {
-                  const barH = Math.min(100, Math.max(15, (h.work_hours / 12) * 100));
-                  const isHigh = h.work_hours >= 10;
-                  return (
-                    <div key={i} className="flex-1 flex flex-col items-center group relative">
-                      <div 
-                        style={{ height: `${barH}%` }}
-                        className={`w-full rounded-sm transition-all ${
-                          isHigh ? 'bg-rose-500 group-hover:bg-rose-400' : 'bg-slate-600 group-hover:bg-slate-500'
-                        }`}
-                      />
-                      <span className="text-[8px] text-slate-500 mt-0.5">{h.date.slice(-2)}</span>
-                    </div>
-                  );
-                })}
+
+              {/* 과거 1주일간의 궤적: 근무시간 & 스트레스 */}
+              <div className="pt-2 border-t border-slate-700/50">
+                <div className="flex items-center justify-between text-[9px] text-slate-400 mb-1">
+                  <span>過去7日間の推移 (勤務h)</span>
+                  <span className="font-mono text-slate-300">max 13h</span>
+                </div>
+                <div className="h-9 flex items-end gap-1 bg-slate-950/50 p-1 rounded-lg border border-slate-800/80">
+                  {activeHistory.map((h, i) => {
+                    const isZero = !h.work_hours || h.work_hours === 0;
+                    const barH = isZero ? 6 : Math.min(100, Math.max(12, (h.work_hours / 13.0) * 100));
+                    const isExtreme = h.work_hours >= 11;
+                    const isOverwork = h.work_hours >= 9.5;
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center group relative h-full justify-end" title={`${h.date}: ${h.work_hours}時間勤務`}>
+                        <div 
+                          style={{ height: `${barH}%` }}
+                          className={`w-full rounded-sm transition-all duration-300 ${
+                            isZero 
+                              ? 'bg-slate-800' 
+                              : isExtreme 
+                              ? 'bg-rose-500 shadow-sm shadow-rose-500/50' 
+                              : isOverwork 
+                              ? 'bg-amber-500' 
+                              : 'bg-indigo-400'
+                          }`}
+                        />
+                        <span className="text-[7px] text-slate-500 mt-0.5 font-mono">{h.date.slice(-2)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
@@ -650,24 +787,41 @@ export default function LifeVitalRadar({
               <p className="text-[11px] text-slate-400 mb-2 truncate">
                 {t('budgetAccelerated')}
               </p>
-              {/* 스파크라인: 7일 지출 금액 */}
-              <div className="h-7 flex items-end gap-1 pt-1 border-t border-slate-700/40">
-                {activeHistory.map((h, i) => {
-                  const maxExp = 60000;
-                  const barH = Math.min(100, Math.max(15, (h.expense_total / maxExp) * 100));
-                  const isHigh = h.expense_total >= 40000;
-                  return (
-                    <div key={i} className="flex-1 flex flex-col items-center group relative">
-                      <div 
-                        style={{ height: `${barH}%` }}
-                        className={`w-full rounded-sm transition-all ${
-                          isHigh ? 'bg-amber-500 group-hover:bg-amber-400' : 'bg-slate-600 group-hover:bg-slate-500'
-                        }`}
-                      />
-                      <span className="text-[8px] text-slate-500 mt-0.5">{h.date.slice(-2)}</span>
-                    </div>
-                  );
-                })}
+
+              {/* 과거 1주일간의 궤적: 일별 지출 */}
+              <div className="pt-2 border-t border-slate-700/50">
+                <div className="flex items-center justify-between text-[9px] text-slate-400 mb-1">
+                  <span>過去7日間の推移 (支出)</span>
+                  <span className="font-mono text-slate-300">max ¥7万</span>
+                </div>
+                <div className="h-9 flex items-end gap-1 bg-slate-950/50 p-1 rounded-lg border border-slate-800/80">
+                  {activeHistory.map((h, i) => {
+                    const isZero = !h.expense_total || h.expense_total === 0;
+                    const barH = isZero ? 6 : Math.min(100, Math.max(12, (h.expense_total / 70000.0) * 100));
+                    const isHigh = h.expense_total >= 45000;
+                    const isModerate = h.expense_total >= 20000;
+                    const dispText = locale === 'ja'
+                      ? `${h.date}: ¥${Math.round(h.expense_total).toLocaleString()}`
+                      : `${h.date}: ${Math.round(h.expense_total).toLocaleString()}원`;
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center group relative h-full justify-end" title={dispText}>
+                        <div 
+                          style={{ height: `${barH}%` }}
+                          className={`w-full rounded-sm transition-all duration-300 ${
+                            isZero 
+                              ? 'bg-slate-800' 
+                              : isHigh 
+                              ? 'bg-amber-500 shadow-sm shadow-amber-500/50' 
+                              : isModerate 
+                              ? 'bg-amber-600/80' 
+                              : 'bg-emerald-500'
+                          }`}
+                        />
+                        <span className="text-[7px] text-slate-500 mt-0.5 font-mono">{h.date.slice(-2)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
@@ -688,23 +842,35 @@ export default function LifeVitalRadar({
               <p className="text-[11px] text-slate-400 mb-2 truncate">
                 {t('sleepDeficitDesc')}
               </p>
-              {/* 스파크라인: 7일 수면 시간 */}
-              <div className="h-7 flex items-end gap-1 pt-1 border-t border-slate-700/40">
-                {activeHistory.map((h, i) => {
-                  const barH = Math.min(100, Math.max(15, (h.sleep_hours / 8.0) * 100));
-                  const isShort = h.sleep_hours < 6.0;
-                  return (
-                    <div key={i} className="flex-1 flex flex-col items-center group relative">
-                      <div 
-                        style={{ height: `${barH}%` }}
-                        className={`w-full rounded-sm transition-all ${
-                          isShort ? 'bg-rose-400 group-hover:bg-rose-300' : 'bg-indigo-400 group-hover:bg-indigo-300'
-                        }`}
-                      />
-                      <span className="text-[8px] text-slate-500 mt-0.5">{h.date.slice(-2)}</span>
-                    </div>
-                  );
-                })}
+
+              {/* 과거 1주일간의 궤적: 수면 시간 */}
+              <div className="pt-2 border-t border-slate-700/50">
+                <div className="flex items-center justify-between text-[9px] text-slate-400 mb-1">
+                  <span>過去7日間の推移 (睡眠h)</span>
+                  <span className="font-mono text-slate-300">基準 7.5h</span>
+                </div>
+                <div className="h-9 flex items-end gap-1 bg-slate-950/50 p-1 rounded-lg border border-slate-800/80">
+                  {activeHistory.map((h, i) => {
+                    const barH = Math.min(100, Math.max(10, (h.sleep_hours / 8.5) * 100));
+                    const isShort = h.sleep_hours < 6.0;
+                    const isDeficit = h.sleep_hours < 7.0;
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center group relative h-full justify-end" title={`${h.date}: ${h.sleep_hours}時間睡眠`}>
+                        <div 
+                          style={{ height: `${barH}%` }}
+                          className={`w-full rounded-sm transition-all duration-300 ${
+                            isShort 
+                              ? 'bg-rose-500 shadow-sm shadow-rose-500/50' 
+                              : isDeficit 
+                              ? 'bg-amber-400' 
+                              : 'bg-blue-400'
+                          }`}
+                        />
+                        <span className="text-[7px] text-slate-500 mt-0.5 font-mono">{h.date.slice(-2)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
@@ -725,20 +891,38 @@ export default function LifeVitalRadar({
               <p className="text-[11px] text-slate-400 mb-2 truncate">
                 {t('familyDinner')} <strong className="text-slate-200">{m.weekly_family_dinners}{t('timesUnit')}</strong>
               </p>
-              {/* 스파크라인: 7일 취미 시간 (분) */}
-              <div className="h-7 flex items-end gap-1 pt-1 border-t border-slate-700/40">
-                {activeHistory.map((h, i) => {
-                  const barH = Math.min(100, Math.max(15, (h.hobby_minutes / 60) * 100));
-                  return (
-                    <div key={i} className="flex-1 flex flex-col items-center group relative">
+
+              {/* 과거 1주일간의 궤적: 취미 시간 & 가족 식사 */}
+              <div className="pt-2 border-t border-slate-700/50">
+                <div className="flex items-center justify-between text-[9px] text-slate-400 mb-1">
+                  <span>過去7日間の推移 (趣味/家族)</span>
+                  <span className="font-mono text-slate-300">目標 4h</span>
+                </div>
+                <div className="h-9 flex items-end gap-1 bg-slate-950/50 p-1 rounded-lg border border-slate-800/80">
+                  {activeHistory.map((h, i) => {
+                    const isZero = !h.hobby_minutes || h.hobby_minutes === 0;
+                    const barH = isZero ? 6 : Math.min(100, Math.max(12, (h.hobby_minutes / 60.0) * 100));
+                    return (
                       <div 
-                        style={{ height: `${barH}%` }}
-                        className="w-full rounded-sm bg-purple-500 group-hover:bg-purple-400 transition-all"
-                      />
-                      <span className="text-[8px] text-slate-500 mt-0.5">{h.date.slice(-2)}</span>
-                    </div>
-                  );
-                })}
+                        key={i} 
+                        className="flex-1 flex flex-col items-center group relative h-full justify-end" 
+                        title={`${h.date}: ${h.hobby_minutes}分 취미 ${h.family_dinner ? '(👨‍👩‍👧 家族夕食)' : ''}`}
+                      >
+                        <div 
+                          style={{ height: `${barH}%` }}
+                          className={`w-full rounded-sm transition-all duration-300 ${
+                            isZero 
+                              ? 'bg-slate-800' 
+                              : h.family_dinner 
+                              ? 'bg-pink-500 shadow-sm shadow-pink-500/50' 
+                              : 'bg-purple-500'
+                          }`}
+                        />
+                        <span className="text-[7px] text-slate-500 mt-0.5 font-mono">{h.date.slice(-2)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>

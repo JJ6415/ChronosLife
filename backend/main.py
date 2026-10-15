@@ -71,16 +71,19 @@ from datetime import datetime, timedelta
 _USER_HISTORY_WINDOW: list[DailySnapshot] = []
 
 def init_user_history_window() -> list[DailySnapshot]:
+    """모든 라이프 바이탈 수치를 0(청정 베이스라인)으로 완전 초기화합니다."""
     global _USER_HISTORY_WINDOW
     base_date = datetime.now() - timedelta(days=7)
     _USER_HISTORY_WINDOW = [
-        DailySnapshot(date=(base_date + timedelta(days=0)).strftime("%m-%d"), expense_total=12000.0, sleep_hours=7.5, work_hours=8.0, family_dinner=True, hobby_minutes=60),
-        DailySnapshot(date=(base_date + timedelta(days=1)).strftime("%m-%d"), expense_total=25000.0, sleep_hours=7.0, work_hours=8.5, family_dinner=False, hobby_minutes=30),
-        DailySnapshot(date=(base_date + timedelta(days=2)).strftime("%m-%d"), expense_total=18000.0, sleep_hours=6.5, work_hours=9.0, family_dinner=False, hobby_minutes=0),
-        DailySnapshot(date=(base_date + timedelta(days=3)).strftime("%m-%d"), expense_total=45000.0, sleep_hours=6.0, work_hours=10.5, family_dinner=False, hobby_minutes=0),
-        DailySnapshot(date=(base_date + timedelta(days=4)).strftime("%m-%d"), expense_total=35000.0, sleep_hours=5.5, work_hours=11.0, family_dinner=False, hobby_minutes=0),
-        DailySnapshot(date=(base_date + timedelta(days=5)).strftime("%m-%d"), expense_total=60000.0, sleep_hours=5.0, work_hours=12.0, family_dinner=False, hobby_minutes=0),
-        DailySnapshot(date=(base_date + timedelta(days=6)).strftime("%m-%d"), expense_total=50000.0, sleep_hours=5.2, work_hours=11.5, family_dinner=False, hobby_minutes=0),
+        DailySnapshot(
+            date=(base_date + timedelta(days=i)).strftime("%m-%d"),
+            expense_total=0.0,
+            sleep_hours=7.5, # 기준 수면과 일치 -> 수면 부채 0.0h
+            work_hours=0.0,
+            family_dinner=False,
+            hobby_minutes=0
+        )
+        for i in range(7)
     ]
     return _USER_HISTORY_WINDOW
 
