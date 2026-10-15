@@ -21,7 +21,7 @@ class LifeStateVector:
     hobby_vitality: float           # 0.0 ~ 1.0
 
 class StateDynamicsEngine:
-    def __init__(self, weekly_budget: float = 280000.0):
+    def __init__(self, weekly_budget: float = 28000.0):
         self.weekly_budget = weekly_budget
 
     def compute_accumulated_state(
@@ -29,7 +29,7 @@ class StateDynamicsEngine:
         history_window: List[DailySnapshot], 
         current_input_expense: float = 0.0,
         current_input_work_hours: float = 0.0,
-        locale: str = "ko"
+        locale: str = "ja"
     ) -> Dict[str, Any]:
         """
         최근 7~10일간의 일일 스냅샷 배열과 당일 입력을 결합하여 

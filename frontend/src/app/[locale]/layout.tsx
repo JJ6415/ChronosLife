@@ -5,8 +5,8 @@ import {getMessages} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 
 export const metadata: Metadata = {
-  title: 'ChronosLife | Log-10 인생 거버넌스',
-  description: '로그 등간격 5단계 계층 시계열 인생 거버넌스 시스템',
+  title: 'ChronosLife | Log-10 階層的時間 人生ガバナンス',
+  description: '対数等間隔5段階階層時系列 人生ガバナンスシステム',
 };
 
 export default async function RootLayout({

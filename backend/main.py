@@ -60,7 +60,7 @@ goal_manager = GoalManager()
 comic_engine = Log10ComicEngine()
 gemini_live_bridge = GeminiLiveBridge()
 history_manager = HistoryManager()
-state_engine = StateDynamicsEngine()
+state_engine = StateDynamicsEngine(weekly_budget=28000.0)
 cache_manager = ChronosContextCacheManager(user_id="default_user")
 ekispert_client = EkispertClient()
 
@@ -91,37 +91,37 @@ def set_preset_history_window(preset_id: str) -> list[DailySnapshot]:
     global _USER_HISTORY_WINDOW
     base_date = datetime.now() - timedelta(days=7)
     if preset_id == "burnout":
-        # 1. バーンアウト危機・限界残業プリセット (4일 연속 11~12h 야근, 수면 4.8h, 지출 과열, 취미/가족 0)
+        # 1. バーンアウト危機・限界残業プリセット (4日連続 11~12h 残業、睡眠 4.8h、支出過熱、趣味/家族 0)
         _USER_HISTORY_WINDOW = [
-            DailySnapshot(date=(base_date + timedelta(days=0)).strftime("%m-%d"), expense_total=32000.0, sleep_hours=6.0, work_hours=10.0, family_dinner=False, hobby_minutes=0),
-            DailySnapshot(date=(base_date + timedelta(days=1)).strftime("%m-%d"), expense_total=45000.0, sleep_hours=5.5, work_hours=10.5, family_dinner=False, hobby_minutes=0),
-            DailySnapshot(date=(base_date + timedelta(days=2)).strftime("%m-%d"), expense_total=42000.0, sleep_hours=5.2, work_hours=11.0, family_dinner=False, hobby_minutes=0),
-            DailySnapshot(date=(base_date + timedelta(days=3)).strftime("%m-%d"), expense_total=58000.0, sleep_hours=5.0, work_hours=12.0, family_dinner=False, hobby_minutes=0),
-            DailySnapshot(date=(base_date + timedelta(days=4)).strftime("%m-%d"), expense_total=62000.0, sleep_hours=4.8, work_hours=12.5, family_dinner=False, hobby_minutes=0),
-            DailySnapshot(date=(base_date + timedelta(days=5)).strftime("%m-%d"), expense_total=68000.0, sleep_hours=4.5, work_hours=13.0, family_dinner=False, hobby_minutes=0),
-            DailySnapshot(date=(base_date + timedelta(days=6)).strftime("%m-%d"), expense_total=52000.0, sleep_hours=5.0, work_hours=12.0, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=0)).strftime("%m-%d"), expense_total=5200.0, sleep_hours=6.0, work_hours=10.0, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=1)).strftime("%m-%d"), expense_total=6800.0, sleep_hours=5.5, work_hours=10.5, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=2)).strftime("%m-%d"), expense_total=5800.0, sleep_hours=5.2, work_hours=11.0, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=3)).strftime("%m-%d"), expense_total=7500.0, sleep_hours=5.0, work_hours=12.0, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=4)).strftime("%m-%d"), expense_total=8200.0, sleep_hours=4.8, work_hours=12.5, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=5)).strftime("%m-%d"), expense_total=9000.0, sleep_hours=4.5, work_hours=13.0, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=6)).strftime("%m-%d"), expense_total=7500.0, sleep_hours=5.0, work_hours=12.0, family_dinner=False, hobby_minutes=0),
         ]
     elif preset_id == "balanced":
-        # 2. 黄金のバランス・安定調和プリセット (수면 7.5h 충분, 칼퇴 및 8h 근무, 지출 적정 45%, 취미 4시간, 가족 식사 4회)
+        # 2. 黄金のバランス・安定調和プリセット (睡眠 7.5h 十分、定時および8h勤務、適正支出、趣味4時間、家族夕食4回)
         _USER_HISTORY_WINDOW = [
-            DailySnapshot(date=(base_date + timedelta(days=0)).strftime("%m-%d"), expense_total=18000.0, sleep_hours=7.5, work_hours=8.0, family_dinner=True, hobby_minutes=40),
-            DailySnapshot(date=(base_date + timedelta(days=1)).strftime("%m-%d"), expense_total=22000.0, sleep_hours=7.5, work_hours=8.0, family_dinner=True, hobby_minutes=30),
-            DailySnapshot(date=(base_date + timedelta(days=2)).strftime("%m-%d"), expense_total=15000.0, sleep_hours=7.2, work_hours=8.5, family_dinner=False, hobby_minutes=30),
-            DailySnapshot(date=(base_date + timedelta(days=3)).strftime("%m-%d"), expense_total=20000.0, sleep_hours=7.5, work_hours=8.0, family_dinner=True, hobby_minutes=40),
-            DailySnapshot(date=(base_date + timedelta(days=4)).strftime("%m-%d"), expense_total=25000.0, sleep_hours=7.8, work_hours=7.5, family_dinner=False, hobby_minutes=40),
-            DailySnapshot(date=(base_date + timedelta(days=5)).strftime("%m-%d"), expense_total=12000.0, sleep_hours=8.0, work_hours=0.0, family_dinner=True, hobby_minutes=60),
-            DailySnapshot(date=(base_date + timedelta(days=6)).strftime("%m-%d"), expense_total=14000.0, sleep_hours=7.5, work_hours=0.0, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=0)).strftime("%m-%d"), expense_total=3200.0, sleep_hours=7.5, work_hours=8.0, family_dinner=True, hobby_minutes=40),
+            DailySnapshot(date=(base_date + timedelta(days=1)).strftime("%m-%d"), expense_total=3800.0, sleep_hours=7.5, work_hours=8.0, family_dinner=True, hobby_minutes=30),
+            DailySnapshot(date=(base_date + timedelta(days=2)).strftime("%m-%d"), expense_total=2500.0, sleep_hours=7.2, work_hours=8.5, family_dinner=False, hobby_minutes=30),
+            DailySnapshot(date=(base_date + timedelta(days=3)).strftime("%m-%d"), expense_total=3400.0, sleep_hours=7.5, work_hours=8.0, family_dinner=True, hobby_minutes=40),
+            DailySnapshot(date=(base_date + timedelta(days=4)).strftime("%m-%d"), expense_total=4000.0, sleep_hours=7.8, work_hours=7.5, family_dinner=False, hobby_minutes=40),
+            DailySnapshot(date=(base_date + timedelta(days=5)).strftime("%m-%d"), expense_total=2000.0, sleep_hours=8.0, work_hours=0.0, family_dinner=True, hobby_minutes=60),
+            DailySnapshot(date=(base_date + timedelta(days=6)).strftime("%m-%d"), expense_total=2500.0, sleep_hours=7.5, work_hours=0.0, family_dinner=False, hobby_minutes=0),
         ]
     elif preset_id == "frugal":
-        # 3. 極限の倹約・修行僧プリセット (하루 지출 5,000~8,000엔 통제, 수면 7.4h, 근무 8.2h, 절약 복리 극대화)
+        # 3. 極限の倹約・修行僧プリセット (1日支出 800~1,500円統制、睡眠 7.4h、勤務 8.2h、複利防衛最大化)
         _USER_HISTORY_WINDOW = [
-            DailySnapshot(date=(base_date + timedelta(days=0)).strftime("%m-%d"), expense_total=6000.0, sleep_hours=7.2, work_hours=8.5, family_dinner=True, hobby_minutes=20),
-            DailySnapshot(date=(base_date + timedelta(days=1)).strftime("%m-%d"), expense_total=8000.0, sleep_hours=7.0, work_hours=8.5, family_dinner=False, hobby_minutes=20),
-            DailySnapshot(date=(base_date + timedelta(days=2)).strftime("%m-%d"), expense_total=5000.0, sleep_hours=7.2, work_hours=8.5, family_dinner=True, hobby_minutes=15),
-            DailySnapshot(date=(base_date + timedelta(days=3)).strftime("%m-%d"), expense_total=7000.0, sleep_hours=7.5, work_hours=8.0, family_dinner=False, hobby_minutes=15),
-            DailySnapshot(date=(base_date + timedelta(days=4)).strftime("%m-%d"), expense_total=9000.0, sleep_hours=7.2, work_hours=8.5, family_dinner=True, hobby_minutes=20),
-            DailySnapshot(date=(base_date + timedelta(days=5)).strftime("%m-%d"), expense_total=8000.0, sleep_hours=8.0, work_hours=0.0, family_dinner=False, hobby_minutes=30),
-            DailySnapshot(date=(base_date + timedelta(days=6)).strftime("%m-%d"), expense_total=6000.0, sleep_hours=7.5, work_hours=0.0, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=0)).strftime("%m-%d"), expense_total=1200.0, sleep_hours=7.2, work_hours=8.5, family_dinner=True, hobby_minutes=20),
+            DailySnapshot(date=(base_date + timedelta(days=1)).strftime("%m-%d"), expense_total=1500.0, sleep_hours=7.0, work_hours=8.5, family_dinner=False, hobby_minutes=20),
+            DailySnapshot(date=(base_date + timedelta(days=2)).strftime("%m-%d"), expense_total=800.0, sleep_hours=7.2, work_hours=8.5, family_dinner=True, hobby_minutes=15),
+            DailySnapshot(date=(base_date + timedelta(days=3)).strftime("%m-%d"), expense_total=1100.0, sleep_hours=7.5, work_hours=8.0, family_dinner=False, hobby_minutes=15),
+            DailySnapshot(date=(base_date + timedelta(days=4)).strftime("%m-%d"), expense_total=1400.0, sleep_hours=7.2, work_hours=8.5, family_dinner=True, hobby_minutes=20),
+            DailySnapshot(date=(base_date + timedelta(days=5)).strftime("%m-%d"), expense_total=1000.0, sleep_hours=8.0, work_hours=0.0, family_dinner=False, hobby_minutes=30),
+            DailySnapshot(date=(base_date + timedelta(days=6)).strftime("%m-%d"), expense_total=900.0, sleep_hours=7.5, work_hours=0.0, family_dinner=False, hobby_minutes=0),
         ]
     else:
         init_user_history_window()
@@ -138,7 +138,7 @@ def set_custom_history_window(
     """사용자가 직접 슬라이더/인풋으로 조율한 바이탈 수치를 7일 스냅샷 배열로 합성합니다."""
     global _USER_HISTORY_WINDOW
     base_date = datetime.now() - timedelta(days=7)
-    total_budget_yen = 280000.0 * (budget_drain_pct / 100.0)
+    total_budget_yen = 28000.0 * (budget_drain_pct / 100.0)
     daily_expense = round(total_budget_yen / 7.0, 1)
 
     daily_sleep = max(4.0, min(9.0, 7.5 - (sleep_debt_hours / 3.0)))
@@ -247,7 +247,7 @@ class AnalyzeRequest(BaseModel):
     scenario_id: Optional[str] = None
     raw_input: Optional[str] = None
     micro_deviation: Optional[float] = None
-    daily_budget: Optional[float] = 40000.0
+    daily_budget: Optional[float] = 4000.0
     annual_interest: Optional[float] = 0.06
     remaining_years: Optional[int] = 28
     model_name: Optional[str] = "gemini-3.5-flash-lite"

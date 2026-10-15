@@ -21,7 +21,7 @@ class WellbeingSubAgent(BaseSubAgent):
         intent_context: Optional[Any] = None,
         user_profile: Optional[Dict[str, Any]] = None,
         preferred_model: Optional[str] = None,
-        locale: str = "ko"
+        locale: str = "ja"
     ) -> Dict[str, Any]:
         profile = user_profile or {}
         min_sleep = int(profile.get("min_sleep_hours", 7))

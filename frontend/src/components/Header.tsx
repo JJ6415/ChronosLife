@@ -1,12 +1,10 @@
 'use client';
 
 import { Activity, Globe } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function Header() {
   const t = useTranslations('Header');
-  const locale = useLocale();
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 flex items-center justify-between px-4 md:px-6">
@@ -26,38 +24,9 @@ export default function Header() {
         </p>
       </div>
 
-      <div className="flex items-center gap-1 bg-slate-900/90 border border-slate-800 rounded-lg p-1 text-xs">
-        <Globe className="w-3.5 h-3.5 text-slate-400 ml-1 mr-0.5" />
-        <Link
-          href="/ja"
-          className={`px-2 py-0.5 rounded transition-colors ${
-            locale === 'ja'
-              ? 'bg-indigo-600 text-white font-bold'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          JA
-        </Link>
-        <Link
-          href="/ko"
-          className={`px-2 py-0.5 rounded transition-colors ${
-            locale === 'ko'
-              ? 'bg-indigo-600 text-white font-bold'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          KO
-        </Link>
-        <Link
-          href="/en"
-          className={`px-2 py-0.5 rounded transition-colors ${
-            locale === 'en'
-              ? 'bg-indigo-600 text-white font-bold'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          EN
-        </Link>
+      <div className="flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 text-xs font-semibold text-indigo-300">
+        <Globe className="w-3.5 h-3.5 text-indigo-400 mr-0.5" />
+        <span>日本語 (JA)</span>
       </div>
     </header>
   );

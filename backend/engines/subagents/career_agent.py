@@ -21,7 +21,7 @@ class CareerSubAgent(BaseSubAgent):
         intent_context: Optional[Any] = None,
         user_profile: Optional[Dict[str, Any]] = None,
         preferred_model: Optional[str] = None,
-        locale: str = "ko"
+        locale: str = "ja"
     ) -> Dict[str, Any]:
         profile = user_profile or {}
         max_work_hours = int(profile.get("max_weekly_hours", 52))

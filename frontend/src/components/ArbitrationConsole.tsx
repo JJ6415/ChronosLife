@@ -228,8 +228,8 @@ export default function ArbitrationConsole({ councilVerdict, governorRuling, mod
                 </div>
               </div>
               <div className={`px-4 py-2 rounded-lg text-lg font-bold flex items-center border ${getBadgeColor(governorRuling.decision)}`}>
-                {governorRuling.decision.toUpperCase() === '승인' ? t('verdictApprove') : 
-                 governorRuling.decision === '기각' ? t('verdictReject') : 
+                {['승인', '承認', 'APPROVE', 'APPROVED'].includes(governorRuling.decision) ? t('verdictApprove') : 
+                 ['기각', '棄却', 'REJECT', 'REJECTED'].includes(governorRuling.decision) ? t('verdictReject') : 
                  t('verdictConditional')}
               </div>
             </div>

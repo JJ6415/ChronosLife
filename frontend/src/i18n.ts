@@ -1,7 +1,7 @@
 import {getRequestConfig} from 'next-intl/server';
 import {hasLocale} from 'next-intl';
 
-const locales = ['ja', 'en', 'ko'];
+const locales = ['ja'];
 
 export default getRequestConfig(async ({requestLocale}) => {
   let locale = await requestLocale;
@@ -10,7 +10,7 @@ export default getRequestConfig(async ({requestLocale}) => {
   }
 
   return {
-    locale,
-    messages: (await import(`./messages/${locale}.json`)).default
+    locale: 'ja',
+    messages: (await import(`./messages/ja.json`)).default
   };
 });

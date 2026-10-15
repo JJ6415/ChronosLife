@@ -39,7 +39,7 @@ class ContextOrchestrator:
     def __init__(self):
         pass
 
-    async def analyze(self, text: str, preferred_model: str = "gemini-3.5-flash-lite", locale: str = "ko") -> IntentContext:
+    async def analyze(self, text: str, preferred_model: str = "gemini-3.5-flash-lite", locale: str = "ja") -> IntentContext:
         api_key = os.environ.get("GEMINI_API_KEY")
         if not api_key:
             raise RuntimeError("GEMINI_API_KEY가 설정되지 않아 오케스트레이터를 가동할 수 없습니다.")

@@ -438,7 +438,7 @@ export default function LifeVitalRadar({
                 ? 'bg-rose-600/90 text-white border-rose-400 shadow-rose-900/40 ring-1 ring-rose-400/50'
                 : 'bg-slate-800/80 hover:bg-rose-950/40 text-rose-300 border-rose-500/30 hover:border-rose-400/60'
             }`}
-            title="4일 연속 12시간 야근, 수면 부족 7.5h, 번아웃 88% 위기 프리셋"
+            title="4日連続12時間残業、睡眠負債7.5時間、バーンアウト88%危機プリセット"
           >
             <span>{t('presetBurnout')}</span>
           </button>
@@ -453,7 +453,7 @@ export default function LifeVitalRadar({
                 ? 'bg-emerald-600/90 text-white border-emerald-400 shadow-emerald-900/40 ring-1 ring-emerald-400/50'
                 : 'bg-slate-800/80 hover:bg-emerald-950/40 text-emerald-300 border-emerald-500/30 hover:border-emerald-400/60'
             }`}
-            title="수면 7.5h 정상, 8시간 근무 준수, 취미 4시간, 가족 식사 4회 안정 프리셋"
+            title="睡眠7.5時間正常、8時間勤務遵守、趣味4時間、家族の夕食4回安定プリセット"
           >
             <span>{t('presetBalanced')}</span>
           </button>
@@ -468,7 +468,7 @@ export default function LifeVitalRadar({
                 ? 'bg-amber-600/90 text-white border-amber-400 shadow-amber-900/40 ring-1 ring-amber-400/50'
                 : 'bg-slate-800/80 hover:bg-amber-950/40 text-amber-300 border-amber-500/30 hover:border-amber-400/60'
             }`}
-            title="일일 지출 최소 통제, 예산 소진 18%, 복리 방어 극대화 프리셋"
+            title="1日支出最小統制、予算消化18%、複利防衛最大化プリセット"
           >
             <span>{t('presetFrugal')}</span>
           </button>
@@ -494,7 +494,7 @@ export default function LifeVitalRadar({
             onClick={handleResetToBaseline}
             disabled={isLoading || isUpdating}
             className="px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shadow-sm flex items-center gap-1 active:scale-95 bg-slate-800 hover:bg-slate-700 text-rose-300 hover:text-white border border-rose-500/30 hover:border-rose-400"
-            title="모든 바이탈 지수를 0(완전 초기화)으로 리셋"
+            title="すべてのバイタル指数を0(完全初期化)にリセット"
           >
             <RotateCcw className={`w-3 h-3 ${isLoading ? 'animate-spin text-rose-400' : 'text-rose-400'}`} />
             <span>{t('btnReset')}</span>
@@ -607,7 +607,7 @@ export default function LifeVitalRadar({
                 <span className="flex items-center gap-1 text-purple-300">
                   <Zap className="w-3.5 h-3.5" /> {t('sliderOverworkDays')}
                 </span>
-                <strong className="font-mono text-purple-300">{customSliders.consecutive_overwork_days}일</strong>
+                <strong className="font-mono text-purple-300">{customSliders.consecutive_overwork_days}日</strong>
               </div>
               <input
                 type="range"
@@ -653,7 +653,7 @@ export default function LifeVitalRadar({
                 <span className="flex items-center gap-1 text-pink-300">
                   <HeartHandshake className="w-3.5 h-3.5" /> {t('sliderFamilyDinners')}
                 </span>
-                <strong className="font-mono text-pink-300">{customSliders.weekly_family_dinners}회 / 주</strong>
+                <strong className="font-mono text-pink-300">{customSliders.weekly_family_dinners}回 / 週</strong>
               </div>
               <input
                 type="range"
@@ -792,17 +792,15 @@ export default function LifeVitalRadar({
               <div className="pt-2 border-t border-slate-700/50">
                 <div className="flex items-center justify-between text-[9px] text-slate-400 mb-1">
                   <span>過去7日間の推移 (支出)</span>
-                  <span className="font-mono text-slate-300">max ¥7万</span>
+                  <span className="font-mono text-slate-300">max ¥1万</span>
                 </div>
                 <div className="h-9 flex items-end gap-1 bg-slate-950/50 p-1 rounded-lg border border-slate-800/80">
                   {activeHistory.map((h, i) => {
                     const isZero = !h.expense_total || h.expense_total === 0;
-                    const barH = isZero ? 6 : Math.min(100, Math.max(12, (h.expense_total / 70000.0) * 100));
-                    const isHigh = h.expense_total >= 45000;
-                    const isModerate = h.expense_total >= 20000;
-                    const dispText = locale === 'ja'
-                      ? `${h.date}: ¥${Math.round(h.expense_total).toLocaleString()}`
-                      : `${h.date}: ${Math.round(h.expense_total).toLocaleString()}원`;
+                    const barH = isZero ? 6 : Math.min(100, Math.max(12, (h.expense_total / 10000.0) * 100));
+                    const isHigh = h.expense_total >= 6000;
+                    const isModerate = h.expense_total >= 3000;
+                    const dispText = `${h.date}: ¥${Math.round(h.expense_total).toLocaleString()}`;
                     return (
                       <div key={i} className="flex-1 flex flex-col items-center group relative h-full justify-end" title={dispText}>
                         <div 
@@ -906,7 +904,7 @@ export default function LifeVitalRadar({
                       <div 
                         key={i} 
                         className="flex-1 flex flex-col items-center group relative h-full justify-end" 
-                        title={`${h.date}: ${h.hobby_minutes}分 취미 ${h.family_dinner ? '(👨‍👩‍👧 家族夕食)' : ''}`}
+                        title={`${h.date}: ${h.hobby_minutes}分 趣味 ${h.family_dinner ? '(👨‍👩‍👧 家族夕食)' : ''}`}
                       >
                         <div 
                           style={{ height: `${barH}%` }}

@@ -117,9 +117,9 @@ export default function DeliberationHistoryTracker({ onLoadRecord }: Deliberatio
 
   // 통계 계산
   const totalCount = history.length;
-  const approvedCount = history.filter(h => h.decision === '승인').length;
-  const conditionalCount = history.filter(h => h.decision === '조건부수정').length;
-  const rejectedCount = history.filter(h => h.decision === '기각').length;
+  const approvedCount = history.filter(h => ['승인', '承認', 'APPROVE', 'APPROVED'].includes(h.decision)).length;
+  const conditionalCount = history.filter(h => ['조건부수정', '조건부', '条件付き修正', '条件付き', 'CONDITIONAL'].includes(h.decision)).length;
+  const rejectedCount = history.filter(h => ['기각', '棄却', 'REJECT', 'REJECTED'].includes(h.decision)).length;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -247,9 +247,9 @@ export default function DeliberationHistoryTracker({ onLoadRecord }: Deliberatio
         <div className="space-y-3">
           {filteredHistory.map(record => {
             const isExpanded = expandedId === record.id;
-            const isApproved = record.decision === '승인';
-            const isConditional = record.decision === '조건부수정';
-            const isRejected = record.decision === '기각';
+            const isApproved = ['승인', '承認', 'APPROVE', 'APPROVED'].includes(record.decision);
+            const isConditional = ['조건부수정', '조건부', '条件付き修正', '条件付き', 'CONDITIONAL'].includes(record.decision);
+            const isRejected = ['기각', '棄却', 'REJECT', 'REJECTED'].includes(record.decision);
 
             return (
               <div

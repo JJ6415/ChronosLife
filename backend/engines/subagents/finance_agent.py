@@ -22,12 +22,12 @@ class FinanceSubAgent(BaseSubAgent):
         intent_context: Optional[Any] = None,
         user_profile: Optional[Dict[str, Any]] = None,
         preferred_model: Optional[str] = None,
-        locale: str = "ko"
+        locale: str = "ja"
     ) -> Dict[str, Any]:
         profile = user_profile or {}
-        daily_budget = float(profile.get("daily_budget", 40000.0))
-        retirement_goal = profile.get("retirement_goal", "은퇴 자산 10억 원")
-        current_seed = profile.get("current_seed", "8,500만 원")
+        daily_budget = float(profile.get("daily_budget", 4000.0 if locale == "ja" else 40000.0))
+        retirement_goal = profile.get("retirement_goal", "リタイア資産1億円" if locale == "ja" else "은퇴 자산 10억 원")
+        current_seed = profile.get("current_seed", "850万円" if locale == "ja" else "8,500만 원")
 
         intent_type = getattr(intent_context, 'intent_type', 'GENERAL') if intent_context else 'GENERAL'
         detected_amount = getattr(intent_context, 'detected_amount', 0.0) if intent_context else 0.0

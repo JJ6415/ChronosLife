@@ -162,7 +162,7 @@ class Log10ComicEngine:
         council_verdict: Optional[Dict[str, Any]] = None,
         governor_ruling: Optional[Dict[str, Any]] = None,
         preferred_model: str = "gemini-3.5-flash-lite",
-        locale: str = "ko"
+        locale: str = "ja"
     ) -> Dict[str, Any]:
         """
         Gemini AI를 실시간 호출하여 5컷 만화 시나리오(씬 묘사, 대사, 시각 테마)를 생성합니다.

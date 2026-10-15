@@ -2,95 +2,95 @@
   "scenarios": [
     {
       "id": "scenario_1_impulse_spend",
-      "title": "시나리오 1: [L0 → L4] 야밤의 충동 지출과 30년 복리 역전파",
-      "description": "금요일 밤 98,000원 기계식 키보드 결제 시 Cloud DLP 마스킹 및 은퇴 지연 복리 역전파",
-      "raw_input": "오늘 우리 아내 이수진과 신한은행 110-384-918237 계좌에서 이번 달 보너스 300만 원 들어왔는데, 너무 스트레스 받아서 쿠팡에서 98,000원짜리 한정판 키보드 결제함.",
-      "dlp_sanitized": "오늘 우리 아내 [PERSON_NAME_1]과 [FINANCIAL_ACCOUNT_NUMBER] 계좌에서 이번 달 [CONFIDENTIAL_BONUS] 들어왔는데, 너무 스트레스 받아서 [ECOMMERCE_PLATFORM]에서 98,000원짜리 한정판 키보드 결제함.",
-      "detected_info_types": ["PERSON_NAME", "FINANCIAL_ACCOUNT_NUMBER", "KR_SALARY_AMOUNT"],
-      "micro_deviation": 98000,
+      "title": "シナリオ 1: [L0 → L4] 深夜の衝動支出と30年複利の逆伝播",
+      "description": "金曜夜 9,800円の限定版キーボード決済時のCloud DLPマスキングおよびリタイア遅延複利逆伝播",
+      "raw_input": "今夜、妻のイ・スジンと三菱UFJ銀行 005-1234567 口座から今月のボーナス30万円が入ったが、ストレスが溜まってAmazonで9,800円の限定版キーボードを決済した。",
+      "dlp_sanitized": "今夜、妻の [PERSON_NAME_1] と [FINANCIAL_ACCOUNT_NUMBER] 口座から今月の [CONFIDENTIAL_BONUS] が入ったが、ストレスが溜まって [ECOMMERCE_PLATFORM] で9,800円の限定版キーボードを決済した。",
+      "detected_info_types": ["PERSON_NAME", "FINANCIAL_ACCOUNT_NUMBER", "JP_SALARY_AMOUNT"],
+      "micro_deviation": 9800,
       "log10_cascade": {
-        "l0_daily": { "tier": "L0 (10^0일: 1일)", "value": "98,000원", "drain_pct": "245%", "status": "초과 소진 (위험)" },
-        "l1_sprint": { "tier": "L1 (10^1일: 10일)", "value": "주말 가처분 예산 100% 소진", "remedy": "내일부터 3일간 외식비 32,600원씩 강제 차감" },
-        "l2_quarter": { "tier": "L2 (10^2일: 100일)", "value": "분기 비상금 달성률 3.2% 하락", "status": "흡수 한계 도달" },
-        "l3_chapter": { "tier": "L3 (10^3일: 3년)", "value": "3년 차 종잣돈 기회손실 118,500원", "status": "시드머니 누수" },
-        "l4_constitution": { "tier": "L4 (10^4일: 30년)", "value": "28년 연 6% 복리 손실 502,400원", "delayed_retirement": "2.4일 은퇴 지연" }
+        "l0_daily": { "tier": "L0 (10^0日: 1日)", "value": "9,800円", "drain_pct": "245%", "status": "超過消費 (危険)" },
+        "l1_sprint": { "tier": "L1 (10^1日: 10日)", "value": "週末可処分予算100%消費", "remedy": "明日から3日間外食費3,260円ずつ強制減額" },
+        "l2_quarter": { "tier": "L2 (10^2日: 100日)", "value": "四半期予備資金達成率 3.2% 低下", "status": "吸収限界到達" },
+        "l3_chapter": { "tier": "L3 (10^3日: 3年)", "value": "3年目シードマネー機会損失 11,850円", "status": "種銭漏出" },
+        "l4_constitution": { "tier": "L4 (10^4日: 30年)", "value": "28年 年6%複利損失 50,240円", "delayed_retirement": "2.4日 リタイア遅延" }
       },
       "council_verdict": {
-        "finance": { "stance": "reject", "reasoning": "일일 한도 245% 초과. L1에서 즉각 회수 조치 요구." },
-        "wellbeing": { "stance": "conditional", "reasoning": "스트레스 완화 효과 인정하나, 장비 수집 충동 반복 시 장기 재정 위협." },
-        "career": { "stance": "neutral", "reasoning": "업무 생산성 향상 도구로서의 한정적 가치 인정." }
+        "finance": { "stance": "reject", "reasoning": "1日限度額の245%を超過。L1スプリントでの即時回収措置を要求。" },
+        "wellbeing": { "stance": "conditional", "reasoning": "ストレス緩和効果は認めるが、装備収集衝動の反復は長期的財務バランスを脅かす。" },
+        "career": { "stance": "neutral", "reasoning": "業務生産性向上ツールとしての限定的価値を認定。" }
       },
       "governor_ruling": {
-        "decision": "조건부수정",
-        "violated_tenets": ["제2조"],
-        "reasoning": "[경고 수용] 98,000원의 일탈을 승인하되, L1 스프린트 규칙에 따라 향후 3일간 일일 가처분 한도를 32,600원 감액 적용합니다.",
-        "pareto_counter_offer": "충동 지출을 인정하되 3일간 외식비 절감으로 L1 내 완전 흡수. 반복 시 L2 동결 경고.",
+        "decision": "条件付き修正",
+        "violated_tenets": ["第2条"],
+        "reasoning": "[警告付き受容] 9,800円の逸脱を承認するが、L1スプリント規則に基づき今後3日間の1日可処有限度を3,260円減額適用します。",
+        "pareto_counter_offer": "衝動支出を認める代わりに3日間の外食費削減でL1内に完全吸収。反復時はL2凍結警告。",
         "l2_review_conditions": null
       }
     },
     {
       "id": "scenario_2_startup_tradeoff",
-      "title": "시나리오 2: [L2 → L3] 고연봉 스타트업 이직 오퍼와 전인적 삶의 상충 중재",
-      "description": "연봉 3,500만 원 인상 vs 주 70시간 야근 오퍼에 대한 최고 거버넌스(Gemini 3.1 Pro)의 파레토 중재",
-      "raw_input": "초기 AI 스타트업에서 연봉 3,500만 원 인상 제안을 받았습니다. 단, 주 70시간 근무에 주말 출근이 빈번합니다. 3년 시드머니를 빨리 모으고 싶은데 이직할까요?",
-      "dlp_sanitized": "초기 AI 스타트업에서 [SALARY_INCREASE: 35,000,000 KRW] 제안을 받았습니다. 단, 주 70시간 근무에 주말 출근이 빈번합니다. 3년 시드머니를 빨리 모으고 싶은데 이직할까요?",
-      "detected_info_types": ["KR_SALARY_AMOUNT"],
+      "title": "シナリオ 2: [L2 → L3] 高年収スタートアップ転職オファーと全人的生活の相反仲裁",
+      "description": "年収350万円アップ vs 週70時間残業オファーに対する最高ガバナンスのパレート仲裁",
+      "raw_input": "初期AIスタートアップから年収350万円アップの提案を受けました。ただし週70時間勤務で週末出勤が頻繁です。3年の種銭を早く集めたいのですが転職すべきでしょうか？",
+      "dlp_sanitized": "初期AIスタートアップから [SALARY_INCREASE: 3,500,000 JPY] の提案を受けました。ただし週70時間勤務で週末出勤が頻繁です。3年の種銭を早く集めたいのですが転職すべきでしょうか？",
+      "detected_info_types": ["JP_SALARY_AMOUNT"],
       "micro_deviation": 0,
       "log10_cascade": null,
       "council_verdict": {
-        "finance": { "stance": "approve", "reasoning": "찬성: 3년 내 순자산 1억 달성 속도를 11개월 단축시킴. 강력 추천." },
-        "career": { "stance": "conditional", "reasoning": "조건부 찬성: 시장 가치와 도메인 전문성은 급상승하나 번아웃 지수 0.85로 임계 초과." },
-        "wellbeing": { "stance": "reject", "reasoning": "결사 반대: 현재 수면 부채 누적 상태. 주당 가족 저녁(3회) 및 주말 취미 몰입(4시간) 완전 박탈로 헌법 제1조 위반." }
+        "finance": { "stance": "approve", "reasoning": "賛成: 3年以内の純資産1,000万円達成速度を11ヶ月短縮。強く推奨。" },
+        "career": { "stance": "conditional", "reasoning": "条件付き賛成: 市場価値と専門性は急上昇するがバーンアウト指数0.85で限界超過。" },
+        "wellbeing": { "stance": "reject", "reasoning": "断固反対: 睡眠負債蓄積状態。週3回の家族夕食および週末4時間の趣味完全剥奪で憲法第1条違反。" }
       },
       "governor_ruling": {
-        "decision": "기각",
-        "violated_tenets": ["제1조", "제3조", "제5조"],
-        "reasoning": "원안 기각. L4 인생 헌법(가족 저녁 식사 주 3회 및 개인 취미 블록 주 4시간 보장)을 위배하므로 현 조건의 이직은 영구 불가합니다.",
-        "pareto_counter_offer": "연봉 인상폭을 2,000만 원으로 낮추되 주 52시간 상한 및 재택근무 주 2회를 보장받는 '카운터오퍼 협상 가이드'를 제시합니다. 또한 L2(100일) 간의 건강 지표 회복을 선결 조건으로 명시합니다.",
-        "l2_review_conditions": "100일 간 수면 7시간 확보, 번아웃 지수 0.70 이하 회복, 주당 취미 블록 4시간 사수를 전제 조건으로 부여합니다."
+        "decision": "却下",
+        "violated_tenets": ["第1条", "第3条", "第5条"],
+        "reasoning": "原案却下。L4人生憲法（家族夕食週3回および趣味ブロック週4時間確保）に違反するため現条件での転職は恒久的に不可です。",
+        "pareto_counter_offer": "年収アップ幅を200万円に抑えつつ週52時間上限および週2日テレワークを確保する交渉ガイドを提示します。またL2(100日)間の健康指標回復を先決条件とします。",
+        "l2_review_conditions": "100日間の睡眠7時間確保、バーンアウト指数0.70以下への回復、週4時間の趣味ブロック死守を前提条件として付与。"
       }
     },
     {
       "id": "scenario_3_burnout_mobility",
-      "title": "시나리오 3: [L0 & Ekispert MCP] 연속 야근 번아웃 감지와 15분 도보 산책 처방",
-      "description": "3일 연속 야근으로 폭식 위험 임계 도달 시, Ekispert API MCP 서버를 통해 녹지 환승 보행로 자동 안내",
-      "raw_input": "3일 연속 22시 퇴근 중. 신주쿠역에서 전철 타려는데 너무 지쳐서 배달 야식 3만 원어치 시켜 먹고 싶음.",
-      "dlp_sanitized": "3일 연속 22시 퇴근 중. [STATION_NAME]에서 전철 타려는데 너무 지쳐서 배달 야식 30,000원어치 시켜 먹고 싶음.",
+      "title": "シナリオ 3: [L0 & Ekispert MCP] 連続残業バーンアウト検知と15分徒歩散歩処方",
+      "description": "3日連続残業で過食リスク限界到達時、Ekispert API MCPサーバーを通じて緑地乗換歩行路を自動案内",
+      "raw_input": "3日連続22時退勤中。新宿駅で電車に乗ろうとしているが、疲れすぎてデリバリー夜食3,000円分を頼みたい。",
+      "dlp_sanitized": "3日連続22時退勤中。[STATION_NAME]で電車に乗ろうとしているが、疲れすぎてデリバリー夜食3,000円分を頼みたい。",
       "detected_info_types": ["LOCATION_DATA"],
-      "micro_deviation": 30000,
+      "micro_deviation": 3000,
       "log10_cascade": {
-        "l0_daily": { "tier": "L0 (10^0일: 1일)", "value": "30,000원", "drain_pct": "75%", "status": "경고" },
-        "l1_sprint": { "tier": "L1 (10^1일: 10일)", "value": "10일 가처분 예산 7.5% 소진", "remedy": "도보 산책으로 충동 야식 차단 권고" },
-        "l2_quarter": { "tier": "L2 (10^2일: 100일)", "value": "분기 비상금 영향 미미 (1.0%)", "status": "정상" },
-        "l3_chapter": { "tier": "L3 (10^3일: 3년)", "value": "기회손실 36,300원", "status": "경미" },
-        "l4_constitution": { "tier": "L4 (10^4일: 30년)", "value": "복리 손실 153,800원", "delayed_retirement": "0.7일 은퇴 지연" }
+        "l0_daily": { "tier": "L0 (10^0日: 1日)", "value": "3,000円", "drain_pct": "75%", "status": "警告" },
+        "l1_sprint": { "tier": "L1 (10^1日: 10日)", "value": "10日可処分予算 7.5% 消費", "remedy": "徒歩散歩による衝動夜食の遮断を勧告" },
+        "l2_quarter": { "tier": "L2 (10^2日: 100日)", "value": "四半期予備資金への影響は軽微 (1.0%)", "status": "正常" },
+        "l3_chapter": { "tier": "L3 (10^3日: 3年)", "value": "機会損失 3,630円", "status": "軽微" },
+        "l4_constitution": { "tier": "L4 (10^4日: 30年)", "value": "複利損失 15,380円", "delayed_retirement": "0.7日 リタイア遅延" }
       },
       "council_verdict": {
-        "finance": { "stance": "reject", "reasoning": "3만 원 야식비는 불필요한 충동 지출. 차단 권고." },
-        "career": { "stance": "neutral", "reasoning": "업무 피로 회복 필요성은 인정하나 야식이 해법은 아님." },
-        "wellbeing": { "stance": "conditional", "reasoning": "스트레스 해소 필요 인정. 단, 폭식 대신 15분 산책으로 대체 시 수면 질 향상 및 주말 취미 컨디션 회복 가능." }
+        "finance": { "stance": "reject", "reasoning": "3,000円の夜食費は不要な衝動支出。遮断を勧告。" },
+        "career": { "stance": "neutral", "reasoning": "業務疲労の回復必要性は認めるが、夜食が根本的解決策ではない。" },
+        "wellbeing": { "stance": "conditional", "reasoning": "ストレス解消の必要性は認める。暴食の代わりに15分散歩で代替すれば睡眠の質が向上し週末のランニングコンディションを回復可能。" }
       },
       "governor_ruling": {
-        "decision": "조건부수정",
-        "violated_tenets": ["제2조"],
-        "reasoning": "야식 충동을 차단하고 Ekispert MCP 녹지 환승 경로로 대체합니다. 15분 도보 산책은 스트레스 해소와 건강 회복을 동시에 달성합니다.",
-        "pareto_counter_offer": "30,000원 야식 대신 15분 녹지 환승 산책으로 1,200kcal 축적 방지 및 주말 러닝 컨디션 회복.",
+        "decision": "条件付き修正",
+        "violated_tenets": ["第2条"],
+        "reasoning": "夜食衝動を遮断しEkispert MCP緑地乗換経路に代替します。15分の徒歩散歩はストレス解消と健康回復を同時に達成します。",
+        "pareto_counter_offer": "3,000円の夜食の代わりに15分の緑地乗換散歩で1,200kcal蓄積防止および週末ランニングコンディションを回復。",
         "l2_review_conditions": null
       },
       "ekispert_prescription": {
-        "trigger": "스트레스 지수 88/100, 충동 배달음식 주문 확률 85% 감지",
-        "standard_route": { "from": "신주쿠역", "to": "오모테산도역", "method": "지하철 최단 환승", "duration": "12분", "congestion": "혼잡" },
+        "trigger": "ストレス指数 88/100, 衝動デリバリー注文確率 85% 検知",
+        "standard_route": { "from": "新宿駅", "to": "表参道駅", "method": "地下鉄最短乗換", "duration": "12分", "congestion": "混雑" },
         "healing_walk_route": {
           "segments": [
-            { "from": "신주쿠역", "to": "신주쿠교엔 녹지 외곽", "method": "도보", "duration": "15분", "description": "조용한 밤공기 속 녹지 보행로" },
-            { "from": "신주쿠교엔", "to": "센다가야역", "method": "도보", "duration": "5분", "description": "역까지 가벼운 산책" },
-            { "from": "센다가야역", "to": "목적지", "method": "전철", "duration": "15분", "description": "여유로운 전철 탑승" }
+            { "from": "新宿駅", "to": "新宿御苑外周緑地", "method": "徒歩", "duration": "15分", "description": "静かな夜風と緑地歩行路" },
+            { "from": "新宿御苑", "to": "千駄ケ谷駅", "method": "徒歩", "duration": "5分", "description": "駅までの軽やかな散歩" },
+            { "from": "千駄ケ谷駅", "to": "目的地", "method": "電車", "duration": "15分", "description": "ゆったりとした乗車" }
           ],
-          "total_duration": "35분"
+          "total_duration": "35分"
         },
-        "action_card": "오늘 밤 3만 원의 야식비와 1,200kcal 축적을 물리적으로 차단하고, 이번 주말 러닝 취미 컨디션을 회복하는 '15분 힐링 녹지 티켓'을 발급했습니다.",
-        "savings": { "food_cost_saved": 30000, "calories_prevented": 1200 },
-        "wellness_impact": "15분 야간 도보 산책으로 코르티솔 수치 23% 감소, 수면 질 15% 향상 기대"
+        "action_card": "今夜3,000円の夜食代と1,200kcal蓄積を物理的に遮断し、今週末のランニングコンディションを回復する「15分ヒーリング緑地チケット」を発行しました。",
+        "savings": { "food_cost_saved": 3000, "calories_prevented": 1200 },
+        "wellness_impact": "15分の夜間徒歩散歩によりコルチゾール値23%減少、睡眠の質15%向上期待"
       }
     }
   ]

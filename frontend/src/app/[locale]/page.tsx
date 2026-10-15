@@ -58,11 +58,11 @@ export default function Home() {
       });
 
       if (!res.ok) {
-        throw new Error(`백엔드 스트리밍 연결 오류 (HTTP ${res.status})`);
+        throw new Error(`バックエンドストリーム接続エラー (HTTP ${res.status})`);
       }
 
       if (!res.body) {
-        throw new Error('스트리밍 응답 바디가 비어 있습니다.');
+        throw new Error('ストリームのレスポンスボディが空です。');
       }
 
       const reader = res.body.getReader();
@@ -87,7 +87,7 @@ export default function Home() {
             const { stage, data, error: stageErr } = eventPayload;
 
             if (stage === 'error' || stageErr) {
-              const errMsg = stageErr || (data && data.error) || '심의 처리 중 오류가 발생했습니다.';
+              const errMsg = stageErr || (data && data.error) || '審議処理中にエラーが発生しました。';
               setError(errMsg);
               setIsLoading(false);
               return;
@@ -120,15 +120,15 @@ export default function Home() {
               setAnalysisResult(data);
             }
           } catch (pe) {
-            console.warn('SSE 파싱 스킵:', pe);
+            console.warn('SSEパースをスキップ:', pe);
           }
         }
       }
 
       setIsStreamingComplete(true);
     } catch (e: any) {
-      console.error('심의 요청 실패:', e);
-      setError(e.message || '심의 요청을 처리하는 중 오류가 발생했습니다.');
+      console.error('審議リクエスト失敗:', e);
+      setError(e.message || '審議リクエストの処理中にエラーが発生しました。');
     } finally {
       setIsLoading(false);
     }

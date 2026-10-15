@@ -36,7 +36,7 @@ Article 4: Any single decision compromising the 30-year retirement asset goal by
 Article 5: All critical decisions must be validated through an L2 (100-day) probationary period before final confirmation.
 '''
 
-CONSTITUTION_TENETS = CONSTITUTION_TENETS_KO
+CONSTITUTION_TENETS = CONSTITUTION_TENETS_JA
 
 class ChiefGovernor:
     """
@@ -57,7 +57,7 @@ class ChiefGovernor:
         cascade_summary: str,
         intent_context: Optional[Any] = None,
         preferred_model: Optional[str] = None,
-        locale: str = "ko"
+        locale: str = "ja"
     ) -> Dict[str, Any]:
         """
         안건에 대한 도메인별 의견과 Log10 요약 결과를 종합하여 최종 결정을 도출합니다.
