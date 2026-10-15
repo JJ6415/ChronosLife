@@ -45,15 +45,15 @@ flowchart TB
     subgraph Agent_Core ["Google Cloud AI Multi-Agent Core (Cloud Run)"]
         Orchestrator["Layer 1: Context Orchestrator AI<br>(Gemini 3.5 Flash)"]
         
-        subgraph Council ["Layer 2: Domain Council Sub-Agents"]
-            Finance["財務エージェント (30年複利資産1億円)"]
-            Career["キャリアエージェント (週52h上限＆市場価値)"]
-            Wellbeing["ウェルビーイングエージェント (睡眠7h＆家族夕食)"]
+        subgraph Council ["Layer 2: Domain Council Sub-Agents (※動的ユーザー目標審議)"]
+            Finance["財務エージェント<br>(長期資産・複利防衛・予算規律 [例: 30年資産1億円])"]
+            Career["キャリアエージェント<br>(市場価値・労働上限・持続的成長 [例: 週52h上限])"]
+            Wellbeing["ウェルビーイングエージェント<br>(心身健康・睡眠負債・家族QOL [例: 睡眠7h/夕食])"]
         end
 
         StateEngine["Log-10 State Dynamics Engine<br>(10^0日〜10^4日の非線形疲労・支出伝播)"]
-        Governor["Layer 3: Chief Governor & 不変の人生憲法<br>(条件付きパレート調停文の生成)"]
-        Comic["Layer 4: 5コマ・ウェブトゥーン生成エンジン<br>(Gemini Vision / Imagen)"]
+        Governor["Layer 3: Chief Governor & 不変の人生憲法<br>(条件付きパレート調停文の自律生成)"]
+        Comic["Layer 4: Log-10 時系列軌道＆5コマ漫画エンジン<br>(3重軌跡シミュレーション＆Gemini Vision)"]
     end
 
     subgraph External_Sponsor ["Layer 5: Sponsor API / MCP Integration"]
@@ -70,6 +70,10 @@ flowchart TB
     Governor --> Comic
     Governor -->|過労・夜食衝動検知時に散歩ルート自律処方| Ekispert
 ```
+
+> **※ 6層アーキテクチャの動的設計について:**  
+> - **Domain Council Sub-Agentsの括弧内表記**（「複利1億円」「週52h上限」「睡眠7h/夕食」など）は、システム動作を検証するための**代表ベンチマークプロファイル（初期例）**です。  
+> - 実際の運用環境では、ユーザーが「人生憲法＆5大目標スタジオ」で対話的に策定した個別目標・憲法ガードレールが動的に各エージェントへインジェクションされ、個別最適化された審議が行われます。
 
 ---
 
