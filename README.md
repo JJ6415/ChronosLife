@@ -1,114 +1,125 @@
-# ⏳ ChronosLife: Log-10 계층 시계열 인생 거버넌스 시스템
+# ⏳ ChronosLife (クロノス・ライフ)
+### Log-10 階層的時間 人生ガバナンス＆自律ライフガードOS
+> **第5回 Agentic AI Hackathon with Google Cloud 出品作**  
+> 「作る」から「使える」へ ―― 厳格なガバナンスとセキュリティを備えた自律型マルチエージェント
 
-> **제5회 Agentic AI Hackathon with Google Cloud** 출품작
-
-$10^0$일(1일)의 미세 충동 행동부터 $10^4$일(~30년)의 인생 헌법까지,  
-로그 등간격 5단계 계층 메모리(Log-10 HTM)를 통해 시계열 인과 단절(Vanishing Causality) 문제를 해결하고,  
-삶의 유한 자원(시간·체력·자본)을 둘러싼 재정·커리어·가족·건강·취미 간의 제로섬 갈등을 자율 중재합니다.
-
----
-
-## 🏗️ 기술 스택
-
-| Layer | 기술 | 역할 |
-|-------|------|------|
-| **Backend** | Python 3.11, FastAPI, Uvicorn | API 서버 |
-| **AI Engine** | Gemini 3.1 Pro, Gemini 3.8 Flash | 중재 & 도메인 에이전트 |
-| **Privacy** | Google Cloud DLP (Sensitive Data Protection) | 실시간 PII 토크나이저 |
-| **Mobility** | Ekispert API MCP 서버 | 힐링 환승 경로 처방 |
-| **Frontend** | Next.js 15, TypeScript, Tailwind CSS v4, Recharts | 대시보드 UI |
-| **Deploy** | Google Cloud Run, Artifact Registry | 서버리스 배포 |
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Firebase%20App%20Hosting-0284c7?style=for-the-badge&logo=firebase)](https://chronoslife-web--chronos-life-510315.asia-east1.hosted.app/ja)
+[![Backend API](https://img.shields.io/badge/Backend%20API-Google%20Cloud%20Run-4285F4?style=for-the-badge&logo=googlecloud)](https://chronoslife-backend-27246861924.asia-northeast1.run.app)
+[![Sponsor MCP](https://img.shields.io/badge/Sponsor%20MCP-駅すぱあと%20(Val%20Lab)-10b981?style=for-the-badge)](https://roote.ekispert.net/)
+[![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)
 
 ---
 
-## 🚀 빠른 시작 (3분 안에 실행)
+## 🌟 プロジェクト概要
 
-### 1. 의존성 설치
+$10^0$日（1日）の衝動的な浪費や残業から、$10^4$日（約30年）の不変の人生憲法まで――  
+**Log-10 等間隔階層時系列モデル（Log-10 HTM）**によって、現代人が直面する**因果関係の断絶（Vanishing Causality）**を数学的に解消。
+
+個人のプライバシーを **Google Cloud DLP (Sensitive Data Protection)** で入口保護し、有限な人生リソース（資本・時間・健康）を巡る各専門AIエージェント（財務・キャリア・ウェルビーイング）の葛藤を、**最高仲裁官（Chief Governor AI）**がパレート最適解へと自律調停します。
+
+---
+
+## 🌐 本番稼働リンク (Live URLs)
+
+- **フロントエンド (Web App)**: [https://chronoslife-web--chronos-life-510315.asia-east1.hosted.app/ja](https://chronoslife-web--chronos-life-510315.asia-east1.hosted.app/ja)
+- **バックエンド (Cloud Run)**: [https://chronoslife-backend-27246861924.asia-northeast1.run.app](https://chronoslife-backend-27246861924.asia-northeast1.run.app)
+- **事前審査用ワンクリック体験**: 会員登録やログイン不要で、ブラウザから即座に3大シナリオ＆Gemini Live対話をお試しいただけます。
+
+---
+
+## 🏛️ 6層自律ガバナンス・アーキテクチャ (6-Layer Architecture)
+
+```mermaid
+flowchart TB
+    subgraph ClientLayer ["Client Presentation (Next.js 15 + Firebase App Hosting)"]
+        User["ユーザー / ブラウザ"]
+        Studio["1. 人生憲法＆5大目標スタジオ (Gemini Live)"]
+        Radar["2. リアルタイム・ライフバイタルレーダー (直近7日間推移)"]
+        Dashboard["3. 自律ガバナンス審議コンソール＆コミック"]
+    end
+
+    subgraph Security_Perimeter ["Layer 0: Ingress Security & Privacy Sandbox"]
+        DLP["Google Cloud DLP (Sensitive Data Protection)<br>氏名・口座番号・給与額をリアルタイム仮名化"]
+    end
+
+    subgraph Agent_Core ["Google Cloud AI Multi-Agent Core (Cloud Run)"]
+        Orchestrator["Layer 1: Context Orchestrator AI<br>(Gemini 3.5 Flash)"]
+        
+        subgraph Council ["Layer 2: Domain Council Sub-Agents"]
+            Finance["財務エージェント (30年複利資産1億円)"]
+            Career["キャリアエージェント (週52h上限＆市場価値)"]
+            Wellbeing["ウェルビーイングエージェント (睡眠7h＆家族夕食)"]
+        end
+
+        StateEngine["Log-10 State Dynamics Engine<br>(10^0日〜10^4日の非線形疲労・支出伝播)"]
+        Governor["Layer 3: Chief Governor & 不変の人生憲法<br>(条件付きパレート調停文の生成)"]
+        Comic["Layer 4: 5コマ・ウェブトゥーン生成エンジン<br>(Gemini Vision / Imagen)"]
+    end
+
+    subgraph External_Sponsor ["Layer 5: Sponsor API / MCP Integration"]
+        Ekispert["駅すぱあと API (MCP サーバー)<br>(株式会社ヴァル研究所)"]
+    end
+
+    User --> Studio & Radar & Dashboard
+    Studio -->|音声/テキスト| DLP
+    Dashboard -->|審議リクエスト| DLP
+    DLP -->|完全非識別化プロンプト| Orchestrator
+    Orchestrator --> Council
+    Council --> StateEngine
+    StateEngine --> Governor
+    Governor --> Comic
+    Governor -->|過労・夜食衝動検知時に散歩ルート自律処方| Ekispert
+```
+
+---
+
+## 🎯 審査員向け 3大実演デモシナリオ
+
+| # | シナリオ名 | 解決する課題と技術ハイライト | 自律処方 / 調停結果 |
+|---|-----------|-----------------------------|--------------------|
+| **1** | **深夜の衝動支出と30年複利逆伝播** | 金曜夜、Amazonで限定版キーボード（9,800円）を衝動買い。**Cloud DLP** が口座番号と氏名を即座にマスク。$10^0$日の浪費が30年後のリタイア資産に与える複利損失を逆伝播。 | **条件付き修正**: 支出を承認する代わりに、L1（10日間）スプリント内で外食費を3日間3,260円ずつ減額吸収。 |
+| **2** | **高年収スタートアップ転職の相反調停** | 年収350万円アップだが週70時間労働オファー。**財務AI（賛成）** vs **健康・家族AI（断固反対）** の価値観衝突。 | **原案却下＆パレート対案**: 週4回家族夕食と趣味4時間を死守するため、週52時間上限＋テレワーク確約での再交渉ガイドを提示。 |
+| **3** | **連続残業バーンアウトと緑地散歩処方** | 3日連続22時退勤で夜食（3,000円）衝動。疲労指数の急上昇を検知し、**駅すぱあと API MCP** と連携。 | **物理世界介入**: 新宿駅で「15分リフレッシュ緑地徒歩ルート」を案内し、前頭葉の意志力回復と夜食を自律防衛。 |
+
+---
+
+## 🛠️ Google Cloud 技術スタックと加点対応
+
+- **Google Cloud Run**: バックエンド（FastAPI Dockerコンテナ）を `asia-northeast1`（東京）に完全サーバレス配備。
+- **Firebase App Hosting**: フロントエンド（Next.js 15）のグローバルホスティング（**スポンサー加点獲得**）。
+- **駅すぱあと API MCP (Model Context Protocol)**: 株式会社ヴァル研究所の交通APIを活用したモビリティ自律処方（**スポンサー加点獲得**）。
+- **Google Cloud DLP (Sensitive Data Protection)**: PII（氏名・口座・給与情報）を実時間で暗号トークン化し、外部LLMの漏洩と過剰迎合を防止（**テーマ適合**）。
+- **Gemini Live (双方向音声＆テキスト)**: ユーザーのリアルタイム音声から人生憲法を対話的に引き出し、5大目標カードを直接同期。
+
+---
+
+## 💻 ローカル開発・検証手順
+
 ```bash
-# Backend
+# 1. リポジトリのクローン
+git clone https://github.com/JJ6415/ChronosLife.git
+cd ChronosLife
+
+# 2. バックエンドの起動 (Python 3.11+)
 cd backend
+python -m venv venv
+# Windows:
+.\venv\Scripts\activate
+# Mac/Linux:
+# source venv/bin/activate
 pip install -r requirements.txt
-
-# Frontend
-cd ../frontend
-npm install
-```
-
-### 2. 환경변수 설정
-```bash
-cp .env.example .env
-# .env 파일의 API 키를 설정하거나 USE_MOCK_FALLBACK=True로 유지
-```
-
-### 3. 서버 실행
-```bash
-# 터미널 1: Backend
-cd backend
 uvicorn main:app --reload --port 8080
 
-# 터미널 2: Frontend
-cd frontend
+# 3. フロントエンドの起動 (別のターミナル)
+cd ../frontend
+npm install
 npm run dev
-```
-
-### 4. 브라우저에서 확인
-`http://localhost:3000` 접속 → 시나리오 버튼 클릭!
-
----
-
-## 🎯 3가지 핵심 데모 시나리오
-
-| # | 시나리오 | 핵심 레이어 | 임팩트 |
-|---|---------|-----------|--------|
-| 1 | **야밤의 충동 지출** | L0→L4 역전파 | 98,000원 → 은퇴 2.4일 지연 |
-| 2 | **이직 오퍼 상충 중재** | L2-L3 파레토 | 연봉 3,500만↑ vs 가족·취미 박탈 |
-| 3 | **번아웃 힐링 산책** | L0 + Ekispert MCP | 야식 3만원 → 15분 녹지 환승 처방 |
-
----
-
-## 📁 프로젝트 구조
-
-```
-chronoslife/
-├── backend/
-│   ├── main.py                    # FastAPI 엔드포인트
-│   ├── config.py                  # Mock/Live 모드 설정
-│   ├── engines/
-│   │   ├── privacy_guard.py       # Layer 1: Cloud DLP 토크나이저
-│   │   ├── log10_engine.py        # Layer 4: Log-10 역전파 수식 엔진
-│   │   ├── domain_council.py      # Layer 2: 3-에이전트 도메인 위원회
-│   │   └── chief_governor.py      # Layer 3: 인생 헌법 중재관
-│   ├── tools/
-│   │   └── ekispert_client.py     # Layer 5: Ekispert MCP 클라이언트
-│   ├── mock_data/
-│   │   └── presets.json           # 3개 데모 프리셋
-│   └── tests/
-│       └── test_engines.py        # 28개 유닛 테스트
-├── frontend/
-│   └── src/
-│       ├── app/page.tsx           # 메인 대시보드
-│       └── components/
-│           ├── PresetSelector.tsx  # 시나리오 선택 UI
-│           ├── DlpComparisonViewer.tsx
-│           ├── Log10Visualizer.tsx
-│           ├── ArbitrationConsole.tsx
-│           └── EkispertActionCard.tsx
-├── Dockerfile                     # Cloud Run 통합 빌드
-├── deploy_cloud_run.sh            # 원클릭 배포 스크립트
-└── docker-compose.yml             # 로컬 개발용
+# http://localhost:3000 にアクセス
 ```
 
 ---
 
-## ☁️ Cloud Run 배포
+## 📄 ライセンス
 
-```bash
-chmod +x deploy_cloud_run.sh
-./deploy_cloud_run.sh
-```
-
----
-
-## 📜 라이선스
-
-MIT License - 제5회 Agentic AI Hackathon with Google Cloud
+本プロジェクトは **MIT License** のもとで公開されています。  
+*第5回 Agentic AI Hackathon with Google Cloud 提出用*
