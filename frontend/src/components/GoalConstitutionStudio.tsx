@@ -209,11 +209,11 @@ const FALLBACK_GOALS_MAP: Record<string, Record<string, GoalItem>> = {
       id: "finance",
       category: "財政 (Finance)",
       icon: "💰",
-      title: "30年複利純資産10億ウォンとリタイア自立",
-      target_value: "リタイア資産10億ウォン",
-      current_value: "現在のシード資産8,500万ウォン",
-      rule: "1日可処分予算40,000ウォン制限を遵守、高リスクレバレッジを遮断",
-      tenet: "第5条 (生涯財政権): 1日可処分40,000ウォンの制限を守り、30年のリタイア資産目標を年間5%以上損なう単一の決定は自動棄却される。",
+      title: "30年複利純資産1億円とリタイア自立",
+      target_value: "リタイア資産1億円",
+      current_value: "現在のシード資産850万円",
+      rule: "1日可処分予算4,000円制限を遵守、高リスクレバレッジを遮断",
+      tenet: "第5条 (生涯財政権): 1日可処分4,000円の制限を守り、30年のリタイア資産目標を年間5%以上損なう単一の決定は自動棄却される。",
       progress: 68
     }
   },
@@ -284,11 +284,11 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
   const t = useTranslations('GoalConstitutionStudio');
   const locale = useLocale();
 
-  const activeInitialPrompts = INITIAL_PROMPTS_MAP[locale] || INITIAL_PROMPTS_MAP.ko;
-  const activeVoiceChips = VOICE_SIMULATION_CHIPS_MAP[locale] || VOICE_SIMULATION_CHIPS_MAP.ko;
-  const activeWelcomeMessage = WELCOME_MESSAGES_MAP[locale] || WELCOME_MESSAGES_MAP.ko;
+  const activeInitialPrompts = INITIAL_PROMPTS_MAP[locale] || INITIAL_PROMPTS_MAP.ja;
+  const activeVoiceChips = VOICE_SIMULATION_CHIPS_MAP[locale] || VOICE_SIMULATION_CHIPS_MAP.ja;
+  const activeWelcomeMessage = WELCOME_MESSAGES_MAP[locale] || WELCOME_MESSAGES_MAP.ja;
 
-  // 모드 전환: 'chat' (텍스트 채팅) vs 'live' (Gemini Live 실시간 양방향 음성 대화)
+  // モード切替: 'chat' (テキストチャット) vs 'live' (Gemini Live リアルタイム双方向音声対話)
   const [interfaceMode, setInterfaceMode] = useState<'chat' | 'live'>('live');
 
   const [goals, setGoals] = useState<Record<string, GoalItem>>(() => {
@@ -459,31 +459,23 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
 
           if (data.type === 'session_connected') {
             setLiveWsStatus('connected');
-            const defaultMsg = locale === 'ja'
-              ? 'Gemini 3.8 Live API セッションが接続されました。お話しください。'
-              : (locale === 'en' ? 'Gemini 3.8 Live session connected. Speak freely.' : 'Gemini 3.8 Live 세션이 연결되었습니다. 말씀하세요.');
+            const defaultMsg = 'Gemini 3.8 Live API セッションが接続されました。お話しください。';
             setLiveTranscript(data.message || defaultMsg);
           } else if (data.type === 'audio_chunk') {
-            // 네이티브 PCM 오디오 청크 큐잉 및 실시간 스케줄링 재생
+            // ネイティブ PCM オーディオチャンクのキューイングおよびリアルタイムスケジューリング再生
             playNativePcmChunk(data.data);
           } else if (data.type === 'interrupted') {
-            // 사용자 발화로 인한 인터럽트 처리 - 오디오 버퍼 즉시 삭제 (Live API 권장사항)
+            // ユーザー発話による割り込み処理 - オーディオバッファ即時破棄
             interruptSpeaking();
           } else if (data.type === 'text_chunk') {
             if (data.delta) {
               setLiveTranscript(prev => (prev.startsWith('🎙️') || prev.startsWith('"') ? data.delta : prev + data.delta));
             }
           } else if (data.type === 'turn_complete') {
-            // 한 턴의 답변이 완료됨 -> 제미니 답변을 대화 히스토리에 누적하고 경청 상태 복귀
+            // 1ターンの回答完了 -> 会話履歴に蓄積し傾聴状態復帰
             setIsChatLoading(false);
 
-            const geminiText = (data.reply && data.reply.trim()) || (
-              locale === 'ja'
-                ? 'はい、承知いたしました。人生目標と憲法をリアルタイムで反映しました。続けてお話しください。'
-                : (locale === 'en'
-                    ? 'Understood. Your life goals and tenets have been updated. Please continue speaking.'
-                    : '네, 말씀하신 가치관을 헌법에 실시간으로 반영했습니다. 계속해서 말씀하세요.')
-            );
+            const geminiText = (data.reply && data.reply.trim()) || 'はい、承知いたしました。人生目標と憲法をリアルタイムで反映しました。続けてお話しください。';
 
             const assistantMsg: ChatMessage = {
               id: (Date.now() + 1).toString(),
@@ -506,9 +498,7 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
               if (!isSpeakingRef.current) {
                 setIsSpeaking(false);
                 isSpeakingRef.current = false;
-                const listenMsg = locale === 'ja'
-                  ? '🎙️ 聞いています。続けて次の価値観や考えをお話しください！'
-                  : (locale === 'en' ? '🎙️ Listening. Continue speaking!' : '🎙️ 듣고 있습니다. 계속해서 다음 가치관이나 생각을 말씀하세요!');
+                const listenMsg = '🎙️ 聞いています。続けて次の価値観や考えをお話しください！';
                 setLiveTranscript(listenMsg);
                 if (isLiveActiveRef.current && !isListeningRef.current) {
                   startListening();
@@ -898,15 +888,13 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
     try {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      const langMap: Record<string, string> = { ja: 'ja-JP', en: 'en-US', ko: 'ko-KR' };
-      utterance.lang = langMap[locale] || 'ja-JP';
+      utterance.lang = 'ja-JP';
 
       try {
         const voices = window.speechSynthesis.getVoices();
         if (voices && voices.length > 0) {
-          const targetPrefix = locale.toLowerCase();
-          const matched = voices.find(v => v.lang.toLowerCase().replace('_', '-').startsWith(targetPrefix)) ||
-                          voices.find(v => v.lang.toLowerCase().includes(targetPrefix));
+          const matched = voices.find(v => v.lang.toLowerCase().startsWith('ja')) ||
+                          voices.find(v => v.lang.toLowerCase().includes('ja'));
           if (matched) {
             utterance.voice = matched;
           }
@@ -934,28 +922,19 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      const alertMsg = locale === 'ja'
-        ? 'お使いのブラウザは音声認識をサポートしていません。Chromeブラウザを推奨します。下のクイック発話チップでもテスト可能です。'
-        : '사용하시는 브라우저가 음성 인식을 지원하지 않습니다. Chrome 브라우저를 권장합니다. 하단의 빠른 음성 발화 칩으로 즉시 테스트하실 수 있습니다.';
-      alert(alertMsg);
+      alert('お使いのブラウザは音声認識をサポートしていません。Google Chromeブラウザを推奨します。');
       return;
     }
 
     try {
       const recognition = new SpeechRecognition();
-      const langMap: Record<string, string> = { ja: 'ja-JP', en: 'en-US', ko: 'ko-KR' };
-      recognition.lang = langMap[locale] || 'ja-JP';
+      recognition.lang = 'ja-JP';
       recognition.continuous = true;
       recognition.interimResults = true;
 
       recognition.onstart = () => {
         setIsListening(true);
-        const startMsgMap: Record<string, string> = {
-          ja: 'マイクが接続されました。お話しください。',
-          ko: '마이크가 연결되었습니다. 계속해서 말씀하세요.',
-          en: 'Microphone connected. Speak freely.'
-        };
-        setLiveTranscript(startMsgMap[locale] || startMsgMap.ja);
+        setLiveTranscript('マイクが接続されました。お話しください。');
       };
 
       recognition.onresult = (event: any) => {
@@ -1118,7 +1097,7 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
       if (data.updated_goals) {
         setGoals(data.updated_goals);
         setLastFocusCategory(data.focus_category);
-        setSaveMessage(`AI 설계관과의 대화를 반영하여 [${data.focus_category?.toUpperCase()}] 목표가 갱신되었습니다.`);
+        setSaveMessage(`AI設計官との対話を反映して[${data.focus_category?.toUpperCase()}]目標が更新されました。`);
         setTimeout(() => setSaveMessage(null), 4000);
       }
 
@@ -1133,7 +1112,7 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
         {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: '죄송합니다. AI 두뇌와의 통신 중 일시적 지연이 발생했습니다. 다시 한번 말씀해 주시겠어요?',
+          content: '申し訳ありません。AI頭脳との通信中に一時的な遅延が発生しました。もう一度お話しいただけますか？',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);
@@ -1142,7 +1121,7 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
     }
   };
 
-  // 3. 직접 수동 편집
+  // 3. 直接手動編集
   const handleStartEdit = (goal: GoalItem) => {
     setEditingId(goal.id);
     setEditFormData({
@@ -1161,7 +1140,8 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           goal_id: goalId,
-          updates: editFormData
+          updates: editFormData,
+          locale: 'ja'
         })
       });
       if (res.ok) {
@@ -1170,7 +1150,7 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
           [goalId]: { ...prev[goalId], ...editFormData }
         }));
         setEditingId(null);
-        setSaveMessage('목표가 성공적으로 저장되었습니다.');
+        setSaveMessage('目標が正常に保存されました。');
         setTimeout(() => setSaveMessage(null), 3000);
       }
     } catch (e) {

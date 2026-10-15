@@ -173,71 +173,107 @@ DEFAULT_GOALS_JA = {
         "id": "finance",
         "category": "財政 (Finance)",
         "icon": "💰",
-        "title": "30年複利純資産10億ウォンとリタイア自立",
-        "target_value": "リタイア資産10億ウォン",
-        "current_value": "現在のシード資産8,500万ウォン",
-        "rule": "1日可処分予算40,000ウォン制限を遵守、高リスクレバレッジを遮断",
-        "tenet": "第5条 (生涯財政権): 1日可処分40,000ウォンの制限を守り、30年のリタイア資産目標を年間5%以上損なう単一の決定は自動棄却される。",
+        "title": "30年複利純資産1億円とリタイア自立",
+        "target_value": "リタイア資産1億円",
+        "current_value": "現在のシード資産850万円",
+        "rule": "1日可処分予算4,000円制限を遵守、高リスクレバレッジを遮断",
+        "tenet": "第5条 (生涯財政権): 1日可処分4,000円の制限を守り、30年のリタイア資産目標を年間5%以上損なう単一の決定は自動棄却される。",
         "progress": 68
     }
 }
 
-DEFAULT_GOALS = DEFAULT_GOALS_KO
+DEFAULT_GOALS = DEFAULT_GOALS_JA
 
 class GoalManager:
     def __init__(self):
-        self.goals = copy.deepcopy(DEFAULT_GOALS_KO)
-        self.custom_updates = {}
+        self.goals_by_locale = {
+            "ko": copy.deepcopy(DEFAULT_GOALS_KO),
+            "en": copy.deepcopy(DEFAULT_GOALS_EN),
+            "ja": copy.deepcopy(DEFAULT_GOALS_JA),
+        }
+        self.custom_updates = {
+            "ko": {},
+            "en": {},
+            "ja": {}
+        }
 
-    def get_goals(self, locale: str = "ko") -> Dict[str, Any]:
-        if locale == "en":
-            base = copy.deepcopy(DEFAULT_GOALS_EN)
-        elif locale == "ja":
-            base = copy.deepcopy(DEFAULT_GOALS_JA)
-        else:
-            base = copy.deepcopy(DEFAULT_GOALS_KO)
+    @property
+    def goals(self) -> Dict[str, Any]:
+        return self.goals_by_locale.get("ja", self.goals_by_locale["ko"])
 
-        # Merge custom user modifications if any
-        for gid, up in self.custom_updates.items():
+    @goals.setter
+    def goals(self, value: Dict[str, Any]):
+        self.goals_by_locale["ja"] = value
+
+    def get_goals(self, locale: str = "ja") -> Dict[str, Any]:
+        loc = (locale or "ja").lower()
+        if loc not in self.goals_by_locale:
+            loc = "ja"
+        base = copy.deepcopy(self.goals_by_locale[loc])
+        for gid, up in self.custom_updates.get(loc, {}).items():
             if gid in base:
                 base[gid].update(up)
         return base
 
-    def update_goal(self, goal_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
-        if goal_id in self.goals:
-            self.goals[goal_id].update(updates)
-            self.custom_updates.setdefault(goal_id, {}).update(updates)
-            return self.goals[goal_id]
+    def update_goal(self, goal_id: str, updates: Dict[str, Any], locale: str = "ja") -> Dict[str, Any]:
+        loc = (locale or "ja").lower()
+        if loc not in self.goals_by_locale:
+            loc = "ja"
+        target_goals = self.goals_by_locale[loc]
+        if goal_id in target_goals:
+            target_goals[goal_id].update(updates)
+            self.custom_updates.setdefault(loc, {}).setdefault(goal_id, {}).update(updates)
+            return target_goals[goal_id]
         raise ValueError(f"Goal '{goal_id}' not found.")
 
-    def reset_goals(self, locale: str = "ko") -> Dict[str, Any]:
-        self.custom_updates.clear()
-        self.goals = copy.deepcopy(DEFAULT_GOALS_KO)
-        return self.get_goals(locale=locale)
+    def reset_goals(self, locale: str = "ja") -> Dict[str, Any]:
+        loc = (locale or "ja").lower()
+        if loc in self.custom_updates:
+            self.custom_updates[loc].clear()
+        if loc == "en":
+            self.goals_by_locale["en"] = copy.deepcopy(DEFAULT_GOALS_EN)
+        elif loc == "ko":
+            self.goals_by_locale["ko"] = copy.deepcopy(DEFAULT_GOALS_KO)
+        else:
+            self.goals_by_locale["ja"] = copy.deepcopy(DEFAULT_GOALS_JA)
+        return self.get_goals(locale=loc)
 
-    def get_user_profile(self) -> Dict[str, Any]:
+    def get_user_profile(self, locale: str = "ja") -> Dict[str, Any]:
         """
         5대 인생 목표 및 헌법 조항에서 실시간 거버넌스 파라미터를 동적으로 추출합니다.
         (하드코딩 40,000원 등 탈피 -> 사용자 헌법 프로필 연동)
         """
-        fin_rule = self.goals.get("finance", {}).get("rule", "")
-        fin_match = re.search(r'(\d+(?:,\d+)*)\s*원', fin_rule)
-        daily_budget = float(fin_match.group(1).replace(',', '')) if fin_match else 40000.0
+        loc = (locale or "ja").lower()
+        current_goals = self.get_goals(locale=loc)
 
-        career_rule = self.goals.get("career", {}).get("rule", "")
-        career_match = re.search(r'(\d+)\s*시간', career_rule)
+        fin_rule = current_goals.get("finance", {}).get("rule", "")
+        fin_match_yen = re.search(r'(\d+(?:,\d+)*)\s*円', fin_rule)
+        fin_match_won = re.search(r'(\d+(?:,\d+)*)\s*원', fin_rule)
+        fin_match_dollar = re.search(r'\$\s*(\d+(?:,\d+)*)', fin_rule)
+
+        if fin_match_yen:
+            daily_budget = float(fin_match_yen.group(1).replace(',', ''))
+        elif fin_match_dollar:
+            daily_budget = float(fin_match_dollar.group(1).replace(',', ''))
+        elif fin_match_won:
+            daily_budget = float(fin_match_won.group(1).replace(',', ''))
+        else:
+            daily_budget = 4000.0 if loc == "ja" else (40.0 if loc == "en" else 40000.0)
+
+        career_rule = current_goals.get("career", {}).get("rule", "")
+        career_match = re.search(r'(\d+)\s*(?:時間|시간|hours|h)', career_rule)
         max_work_hours = int(career_match.group(1)) if career_match else 52
 
-        fam_target = self.goals.get("family", {}).get("target_value", "")
-        fam_match = re.search(r'(\d+)\s*회', fam_target)
+        fam_target = current_goals.get("family", {}).get("target_value", "")
+        fam_match = re.search(r'(\d+)\s*(?:回|회|times)', fam_target)
         family_meals = int(fam_match.group(1)) if fam_match else 3
 
-        hobby_target = self.goals.get("hobby", {}).get("target_value", "")
-        hobby_match = re.search(r'(\d+)\s*시간', hobby_target)
+        hobby_target = current_goals.get("hobby", {}).get("target_value", "")
+        hobby_match = re.search(r'(\d+)\s*(?:時間|시간|hours|h)', hobby_target)
         hobby_hours = int(hobby_match.group(1)) if hobby_match else 4
 
-        health_target = self.goals.get("health", {}).get("target_value", "")
-        health_match = re.search(r'(\d+)\s*시간', health_target)
+        health_target = current_goals.get("health", {}).get("target_value", "")
+        health_match = re.search(r'(\d+)\s*(?:時間|시간|hours|h)', health_target)
         sleep_hours = int(health_match.group(1)) if health_match else 7
 
         return {
@@ -246,8 +282,8 @@ class GoalManager:
             "family_dinner_quota": family_meals,
             "hobby_block_quota": hobby_hours,
             "min_sleep_hours": sleep_hours,
-            "retirement_goal": self.goals.get("finance", {}).get("target_value", "은퇴 자산 10억 원"),
-            "current_seed": self.goals.get("finance", {}).get("current_value", "현재 시드 8,500만 원")
+            "retirement_goal": current_goals.get("finance", {}).get("target_value", "リタイア資産1億円" if loc == "ja" else "은퇴 자산 10억 원"),
+            "current_seed": current_goals.get("finance", {}).get("current_value", "現在のシード資産850万円" if loc == "ja" else "현재 시드 8,500만 원")
         }
 
     def ai_generate_goals(self, user_persona: str = "30대 직장인") -> Dict[str, Any]:
@@ -280,7 +316,7 @@ class GoalManager:
                 import json
 
                 client = genai.Client(api_key=api_key)
-                current_state_str = json.dumps(self.goals, ensure_ascii=False)
+                current_state_str = json.dumps(self.get_goals(locale=loc), ensure_ascii=False)
 
                 history_str = ""
                 if history:
@@ -401,34 +437,25 @@ class GoalManager:
                 suggested = parsed.get("suggested_goals", {})
 
                 for k, v in suggested.items():
-                    if k in self.goals and isinstance(v, dict):
-                        self.goals[k].update({pk: pv for pk, pv in v.items() if pk in ["title", "target_value", "rule", "tenet"]})
+                    if isinstance(v, dict):
+                        clean_v = {pk: pv for pk, pv in v.items() if pk in ["title", "target_value", "rule", "tenet"]}
+                        try:
+                            self.update_goal(k, clean_v, locale="ja")
+                        except Exception as ge:
+                            print(f"Goal update warning: {ge}")
 
                 dynamic_prompts = parsed.get("suggested_next_prompts", [])
                 if not dynamic_prompts:
-                    if loc == "ja":
-                        dynamic_prompts = [
-                            "家族の夕食を確保するため平日19時以降の通知ブロックルールを追加できる？",
-                            "週末の趣味4時間枠を守るため休日の業務連絡完全禁止条項を入れてほしい。",
-                            "現在の月給から30年複利で1億円の資産を作るには毎月いくら貯蓄が必要？"
-                        ]
-                    elif loc == "en":
-                        dynamic_prompts = [
-                            "Can you add a 7 PM notification block rule for family dinners?",
-                            "Add an absolute ban on weekend work contacts to protect my 4-hour hobby block.",
-                            "How much do I need to save monthly to achieve $1M in 30 years with compound interest?"
-                        ]
-                    else:
-                        dynamic_prompts = [
-                            "가족 저녁 식사를 위한 평일 19시 노티 차단 규칙도 넣어줄래?",
-                            "주말 취미 4시간 쿼터를 위해 주말 출근 절대 금지 조항을 추가해줘.",
-                            "현재 내 월급에서 30년 복리 10억을 달성하려면 매달 얼마를 모아야 해?"
-                        ]
+                    dynamic_prompts = [
+                        "家族の夕食を確保するため平日19時以降の通知ブロックルールを追加できる？",
+                        "週末の趣味4時間枠を守るため休日の業務連絡完全禁止条項を入れてほしい。",
+                        "現在の月給から30年複利で1億円の資産を作るには毎月いくら貯蓄が必要？"
+                    ]
 
-                default_reply = "目標を調整しました。" if loc == "ja" else ("Goal adjusted successfully." if loc == "en" else "목표를 성공적으로 조율했습니다.")
+                default_reply = "人生目標および不変の憲法条項を更新しました。"
                 return {
                     "reply": parsed.get("reply", default_reply),
-                    "updated_goals": self.goals,
+                    "updated_goals": self.get_goals(locale="ja"),
                     "focus_category": parsed.get("focus_category", "general"),
                     "suggested_next_prompts": dynamic_prompts
                 }
@@ -436,159 +463,104 @@ class GoalManager:
             except Exception as e:
                 print(f"Gemini Goal Chat failed: {e}. Falling back to mock dialogue.")
 
-        # ── Mock 대화 코칭 로직 (키가 없거나 실패 시) ──
+        # ── Mock 対話コーチングロジック (APIキー未設定またはエラー時の日本語フォールバック) ──
         lower = message.lower()
-        if loc == "ja":
-            reply = "お話しいただいた価値観を真摯に受け止めました。ワークライフバランスを守るため、どの領域を最優先で保護したいですか？"
-            focus = "general"
-            dynamic_prompts = [
-                "週3回の家族の夕食を守るため、退社時間の強制ロックをかけたい。",
-                "週末のランニングと個人趣味のための4時間クォータ憲法を立ててほしい。",
-                "残業を減らして年収を維持しながら財務バランスを取るにはどうすればいい？"
-            ]
+        reply = "お話しいただいた価値観を真摯に受け止めました。ワークライフバランスを守るため、どの領域を最優先で保護したいですか？"
+        focus = "general"
+        dynamic_prompts = [
+            "週3回の家族の夕食を守るため、退社時間の強制ロックをかけたい。",
+            "週末のランニングと個人趣味のための4時間クォータ憲法を立ててほしい。",
+            "残業を減らして年収を維持しながら財務バランスを取るにはどうすればいい？"
+        ]
 
-            if any(k in lower for k in ["家族", "子供", "妻", "夫", "夕食", "かぞく"]):
-                reply = "家族との時間は一度過ぎると二度と戻らない最も尊い財産です。どんなに多忙なプロジェクトでも週3回以上の家族夕食を『絶対不可侵憲法第1条』として刻み込むことを提案します。同意されますか？"
-                focus = "family"
-                self.goals["family"]["title"] = "週3回以上の家族夕食厳守と週末の完全な同行"
-                self.goals["family"]["rule"] = "平日19時以降の業務通知遮断、週末家族イベント最優先"
-                dynamic_prompts = [
-                    "平日19時以降のビジネスチャット通知を強制オフにする制約ルールを追加して。",
-                    "週に一度残業が発生したら週末ランチで代替する例外ルールはどう？",
-                    "家族旅行のために四半期に一度の週末完全オフ条項を作ってほしい。"
-                ]
-            elif any(k in lower for k in ["趣味", "ランニング", "音楽", "楽器", "運動", "しゅみ"]):
-                reply = "個人の趣味は単なる余暇ではなく、バーンアウトを防ぐ心の酸素ボンベです！週4時間の『趣味専用ロック枠』を憲法第2条に指定しました。現在行っている趣味についてもっと詳しく教えていただけますか？"
-                focus = "hobby"
-                self.goals["hobby"]["title"] = "週末個人趣味への没頭4時間強制枠（ランニング・創作）"
-                self.goals["hobby"]["rule"] = "週末午前の趣味ブロック設定時はすべての業務連絡を拒否"
-                dynamic_prompts = [
-                    "趣味の機材購入費用をL1（10日）バッファーで吸収する条件は？",
-                    "週末午前に2時間のランニングブロックを確保するためカレンダーをロックしたい。",
-                    "趣味活動を維持するための1日7時間睡眠連動憲法も整えて。"
-                ]
-            elif any(k in lower for k in ["残業", "健康", "睡眠", "疲労", "つかれ", "ねむり"]):
-                reply = "持続可能な成長は健康な身体があってこそです。連続3日以上の残業を防ぎ、1日7時間睡眠を死守する憲法第3条を策定しました。最近の平均睡眠時間は何時間ほどですか？"
-                focus = "health"
-                self.goals["health"]["title"] = "1日7時間睡眠の確保と連続残業の防止"
-                self.goals["health"]["rule"] = "22時以降の業務禁止および就寝前のスマートフォン遮断"
-                dynamic_prompts = [
-                    "連続3日の残業が検知されたらEkispert 15分徒歩散歩チケットを強制発行するルールを追加して。",
-                    "睡眠負債が5時間以上蓄積した際に出勤を1時間遅らせるバッファールールがほしい。",
-                    "深夜の衝動的な夜食注文を物理的に防ぐ財務ガードレールはどう立てる？"
-                ]
-            elif any(k in lower for k in ["金", "引退", "財務", "投資", "年収", "貯蓄", "資産", "円"]):
-                reply = "経済的自立は真の自由の基盤です。1日の可処分予算3,000円を守りながら、30年複利で1億円の資産を築く軌跡を憲法第5条として整えました。目標とする引退時期はいつ頃とお考えですか？"
-                focus = "finance"
-                self.goals["finance"]["title"] = "30年複利1億円の引退資産および3年でシード資金1,000万円達成"
-                dynamic_prompts = [
-                    "毎月10万円ずつ貯蓄・投資したときの30年複利（年利6%）の最終資産は？",
-                    "予期せぬ大きな出費が発生した際にL2（100日）緊急資金で吸収する条件は？",
-                    "年収350万円アップの転職提案が来た際に家族の時間を損なわずに交渉するガイドラインを。"
-                ]
-        else:
-            reply = "말씀해주신 가치관을 깊이 새겨들었습니다. 일과 삶의 균형을 위해 어떤 영역을 가장 먼저 보호하고 싶으신가요?"
-            focus = "general"
+        if any(k in lower for k in ["家族", "子供", "妻", "夫", "夕食", "かぞく", "family"]):
+            reply = "家族との時間は一度過ぎると二度と戻らない最も尊い財産です。どんなに多忙なプロジェクトでも週3回以上の家族夕食を『絶対不可侵憲法第1条』として刻み込むことを提案します。同意されますか？"
+            focus = "family"
+            self.update_goal("family", {
+                "title": "週3回以上の家族夕食厳守と週末の完全な同行",
+                "rule": "平日19時以降の業務通知遮断、週末家族イベント最優先"
+            }, locale="ja")
             dynamic_prompts = [
-                "가족 저녁 식사 주 3회를 위한 퇴근 시간 강제 락을 걸고 싶어.",
-                "주말 러닝과 개인 취미를 위한 4시간 쿼터 헌법을 세워줘.",
-                "야근을 줄이면 기대 연봉이 낮아질 수 있는데 재정 밸런스는 어떻게 맞춰?"
+                "平日19時以降のビジネスチャット通知を強制オフにする制約ルールを追加して。",
+                "週に一度残業が発生したら週末ランチで代替する例外ルールはどう？",
+                "家族旅行のために四半期に一度の週末完全オフ条項を作ってほしい。"
             ]
-
-            if "가족" in lower or "아이" in lower or "아내" in lower or "남편" in lower:
-                reply = "가족과의 일상은 한 번 지나가면 다시 오지 않는 가장 소중한 시간입니다. 아무리 바쁜 프로젝트라도 주당 최소 3회의 가족 저녁 식사를 '절대 불가침 헌법 제1조'로 못 박아둘 것을 제안합니다. 동의하시나요?"
-                focus = "family"
-                self.goals["family"]["title"] = "가족 저녁 식사 주 3회 절대 사수 및 주말 온전한 동행"
-                self.goals["family"]["rule"] = "평일 19시 이후 업무 알림 차단, 주말 가족 일정 최우선"
-                dynamic_prompts = [
-                    "평일 19시 이후 업무 메신저 알림을 강제로 끄는 제약 룰을 추가해줘.",
-                    "만약 주중에 야근이 생기면 주말 점심으로 식사를 대체하는 예외 룰은 어떨까?",
-                    "가족과의 여행을 위해 분기별 1회 주말 락다운 조항도 만들어줘."
-                ]
-            elif "취미" in lower or "러닝" in lower or "음악" in lower or "악기" in lower or "운동" in lower:
-                reply = "개인 취미는 단순한 여가가 아니라 번아웃을 방어하는 자아의 산소호흡기입니다! 주당 최소 4시간의 '개인 취미 잠금 쿼터'를 헌법 제2조로 지정하여 업무 스트레스를 해소하도록 업데이트했습니다. 현재 하고 계신 취미 활동을 더 알려주시겠어요?"
-                focus = "hobby"
-                self.goals["hobby"]["title"] = "주말 개인 취미 몰입 4시간 강제 쿼터 (러닝·창작·재충전)"
-                self.goals["hobby"]["rule"] = "주말 오전 취미 블록 설정 시 모든 업무 연락 수신 거부"
-                dynamic_prompts = [
-                    "취미 장비 구매 비용은 L1(10일) 완충재 내에서 어떻게 허용할 수 있어?",
-                    "주말 오전에 2시간씩 러닝 블록을 방해받지 않도록 캘린더를 잠그고 싶어.",
-                    "취미 활동을 지속하기 위한 일일 수면 7시간 연계 헌법도 다듬어줘."
-                ]
-            elif "야근" in lower or "건강" in lower or "수면" in lower or "피로" in lower:
-                reply = "지속 가능한 성장은 건강한 신체에서만 나옵니다. 연속 3일 야근을 방어하고 일일 수면 7시간을 사수하는 헌법 제3조를 수립했습니다. 최근 수면 시간은 대략 몇 시간 정도 유지되고 계신가요?"
-                focus = "health"
-                self.goals["health"]["title"] = "일일 7시간 수면 확보 및 연속 야근 차단"
-                self.goals["health"]["rule"] = "22시 이후 업무 금지 및 취침 전 스마트폰 차단"
-                dynamic_prompts = [
-                    "연속 3일 야근이 감지되면 Ekispert 15분 도보 산책 티켓을 강제 발급하는 룰을 넣어줘.",
-                    "수면 부채가 5시간 이상 누적되었을 때 출근 시간을 1시간 늦추는 완충 룰이 필요해.",
-                    "야간 충동 야식 배달 주문을 물리적으로 차단하는 재정 가드레일은 어떻게 세워?"
-                ]
-            elif "돈" in lower or "은퇴" in lower or "재정" in lower or "시드" in lower or "연봉" in lower:
-                reply = "재정적 자립은 진정한 자유의 토대입니다. 일일 가처분 4만 원 한도를 지키면서 30년 복리로 10억 은퇴 자산을 만드는 궤적을 헌법 제5조로 다듬었습니다. 현재 생각하시는 목표 은퇴 시점은 언제인가요?"
-                focus = "finance"
-                self.goals["finance"]["title"] = "30년 복리 10억 은퇴 자산 및 3년 시드머니 1억 달성"
-                dynamic_prompts = [
-                    "매월 100만 원씩 저축할 때 30년 복리 연 6% 수익률이면 최종 얼마가 모여?",
-                    "예상치 못한 목돈 지출이 생겼을 때 L2(100일) 비상금으로 흡수하는 조건은?",
-                    "연봉 3,500만 원 인상 제안이 왔을 때 가족 시간을 침해하지 않고 협상하는 가이드를 줘."
-                ]
+        elif any(k in lower for k in ["趣味", "ランニング", "音楽", "楽器", "運動", "しゅみ", "hobby"]):
+            reply = "個人の趣味は単なる余暇ではなく、バーンアウトを防ぐ心の酸素ボンベです！週4時間の『趣味専用ロック枠』を憲法第2条に指定しました。現在行っている趣味についてもっと詳しく教えていただけますか？"
+            focus = "hobby"
+            self.update_goal("hobby", {
+                "title": "週末個人趣味への没頭4時間強制枠（ランニング・創作）",
+                "rule": "週末午前の趣味ブロック設定時はすべての業務連絡を拒否"
+            }, locale="ja")
+            dynamic_prompts = [
+                "趣味の機材購入費用をL1（10日）バッファーで吸収する条件は？",
+                "週末午前に2時間のランニングブロックを確保するためカレンダーをロックしたい。",
+                "趣味活動を維持するための1日7時間睡眠連動憲法も整えて。"
+            ]
+        elif any(k in lower for k in ["残業", "健康", "睡眠", "疲労", "つかれ", "ねむり", "health"]):
+            reply = "持続可能な成長は健康な身体があってこそです。連続3日以上の残業を防ぎ、1日7時間睡眠を死守する憲法第3条を策定しました。最近の平均睡眠時間は何時間ほどですか？"
+            focus = "health"
+            self.update_goal("health", {
+                "title": "1日7時間睡眠の確保と連続残業の防止",
+                "rule": "22時以降の業務禁止および就寝前のスマートフォン遮断"
+            }, locale="ja")
+            dynamic_prompts = [
+                "連続3日の残業が検知されたらEkispert 15分徒歩散歩チケットを強制発行するルールを追加して。",
+                "睡眠負債が5時間以上蓄積した際に出勤を1時間遅らせるバッファールールがほしい。",
+                "深夜の衝動的な夜食注文を物理的に防ぐ財務ガードレールはどう立てる？"
+            ]
+        elif any(k in lower for k in ["金", "引退", "財務", "投資", "年収", "貯蓄", "資産", "円", "finance"]):
+            reply = "経済的自立は真の自由の基盤です。1日の可処分予算4,000円を守りながら、30年複利で1億円の資産を築く軌跡を憲法第5条として整えました。目標とする引退時期はいつ頃とお考えですか？"
+            focus = "finance"
+            self.update_goal("finance", {
+                "title": "30年複利1億円の引退資産および3年でシード資金850万円達成",
+                "rule": "1日可処分予算4,000円制限を厳守、高リスクレバレッジ遮断"
+            }, locale="ja")
+            dynamic_prompts = [
+                "毎月10万円ずつ貯蓄・投資したときの30年複利（年利6%）の最終資産は？",
+                "予期せぬ大きな出費が発生した際にL2（100日）緊急資金で吸収する条件は？",
+                "年収350万円アップの転職提案が来た際に家族の時間を損なわずに交渉するガイドラインを。"
+            ]
 
         return {
             "reply": reply,
-            "updated_goals": self.goals,
+            "updated_goals": self.get_goals(locale="ja"),
             "focus_category": focus,
             "suggested_next_prompts": dynamic_prompts
         }
 
-    def evaluate_action_impact(self, raw_input: str, micro_deviation: float, council_verdict: dict, locale: str = "ko") -> List[Dict[str, Any]]:
+    def evaluate_action_impact(self, raw_input: str, micro_deviation: float, council_verdict: dict, locale: str = "ja") -> List[Dict[str, Any]]:
         """
-        사용자가 입력한 행동/사건이 5대 목표(재정, 커리어, 건강, 가족, 취미) 각각에
-        미치는 긍정적(+) / 부정적(-) 영향을 계산합니다.
+        ユーザーが入力した行動・出来事が5大目標（財政、キャリア、健康、家族、趣味）それぞれに
+        与えるプラス(+) / マイナス(-)の影響を計算します。
         """
         impacts = []
         text = raw_input.lower()
 
-        profile = self.get_user_profile()
+        profile = self.get_user_profile(locale="ja")
         user_budget = profile["daily_budget"]
 
-        # 1. 재정 (Finance) 영향도
+        # 1. 財政 (Finance)
         if micro_deviation > user_budget:
             fin_score = -min(80, int((micro_deviation / user_budget) * 15))
             fin_status = "NEGATIVE"
-            fin_reason = f"사용자 일일 한도({user_budget:,.0f}원) 초과(-{micro_deviation:,.0f}원). L1 완충재 잠식 및 30년 복리 기회비용 발생"
-        elif "연봉" in text and ("인상" in text or "제안" in text):
+            fin_reason = f"1日の予算上限（{user_budget:,.0f}円）を{micro_deviation:,.0f}円超過。L1バッファー消費および30年複利機会損失。"
+        elif any(k in text for k in ["年収", "昇給", "給与", "オファー", "연봉", "인상"]):
             fin_score = +45
             fin_status = "POSITIVE"
-            fin_reason = "연봉 인상으로 3년 차 순자산 시드머니 조기 축적 기회"
+            fin_reason = "給与アップによる3年目シード資金の早期達成機会。"
         elif micro_deviation > 0:
             fin_score = -10
             fin_status = "NEGATIVE"
-            fin_reason = f"소액 지출({micro_deviation:,.0f}원)로 L0 예산({user_budget:,.0f}원) 일부 차감"
+            fin_reason = f"少額支出（{micro_deviation:,.0f}円）による日常予算の一部消化。"
         else:
             fin_score = +10
             fin_status = "POSITIVE"
-            fin_reason = "불필요한 충동 소비 없음 (가처분 예산 온전 유지)"
-
-        if locale == "en":
-            name = "Finance"
-            if fin_score < -10: fin_reason = f"Daily budget exceeded by {micro_deviation:,.0f}."
-            elif fin_score > 40: fin_reason = "Salary increase brings faster seed accumulation."
-            elif fin_score < 0: fin_reason = f"Minor expense ({micro_deviation:,.0f}) deducted."
-            else: fin_reason = "No impulsive spending."
-        elif locale == "ja":
-            name = "財政"
-            if fin_score < -10: fin_reason = f"一日の予算を{micro_deviation:,.0f}超過しました。"
-            elif fin_score > 40: fin_reason = "給与アップによるシードマネー早期蓄積。"
-            elif fin_score < 0: fin_reason = f"少額の支出（{micro_deviation:,.0f}）発生。"
-            else: fin_reason = "衝動買いなし。"
-        else:
-            name = "재정"
+            fin_reason = "不要な衝動買いなし（可処分予算の温存）。"
 
         impacts.append({
             "category_id": "finance",
-            "name": name,
+            "name": "財政",
             "icon": "💰",
             "score": fin_score,
             "status": fin_status,
@@ -596,42 +568,27 @@ class GoalManager:
             "delta_label": f"{fin_score:+d}%"
         })
 
-        # 2. 커리어 (Career) 영향도
-        if "이직" in text or "연봉" in text or "스타트업" in text or "프로젝트" in text:
+        # 2. キャリア (Career)
+        if any(k in text for k in ["転職", "昇給", "スタートアップ", "プロジェクト", "이직", "프로젝트"]):
             car_score = +35
             car_status = "POSITIVE"
-            car_reason = "시장 가치 재평가 및 새로운 기술 도메인 역량 확장 기회"
-        elif "야근" in text or "철야" in text:
+            car_reason = "市場価値の再評価および新規ドメインにおける専門性の拡張機会。"
+        elif any(k in text for k in ["残業", "徹夜", "야근", "철야"]):
             car_score = +10
             car_status = "POSITIVE"
-            car_reason = "단기 마일스톤 납품 달성에 기여 (단, 장기 지속 불가능)"
-        elif "키보드" in text or "장비" in text:
+            car_reason = "短期的マイルストーン達成への寄与（ただし長期継続は非推奨）。"
+        elif any(k in text for k in ["キーボード", "機材", "ディスプレイ", "장비"]):
             car_score = +15
             car_status = "POSITIVE"
-            car_reason = "업무 생산성 및 개발 환경 쾌적도 개선 효과"
+            car_reason = "業務生産性および開発環境の快適性向上。"
         else:
             car_score = 0
             car_status = "NEUTRAL"
-            car_reason = "직접적인 커리어 스킬 변화 없음"
-
-        if locale == "en":
-            name = "Career"
-            if car_score > 30: car_reason = "Market value re-evaluation and domain expansion."
-            elif car_score > 10: car_reason = "Improved work productivity."
-            elif car_score > 0: car_reason = "Short-term milestone achieved."
-            else: car_reason = "No direct impact on career."
-        elif locale == "ja":
-            name = "キャリア"
-            if car_score > 30: car_reason = "市場価値の再評価とドメインの拡大。"
-            elif car_score > 10: car_reason = "業務生産性の向上。"
-            elif car_score > 0: car_reason = "短期的な目標達成。"
-            else: car_reason = "キャリアへの直接的な影響なし。"
-        else:
-            name = "커리어"
+            car_reason = "キャリアスキルへの直接的な変化なし。"
 
         impacts.append({
             "category_id": "career",
-            "name": name,
+            "name": "キャリア",
             "icon": "📈",
             "score": car_score,
             "status": car_status,
@@ -639,42 +596,27 @@ class GoalManager:
             "delta_label": f"{car_score:+d}%"
         })
 
-        # 3. 건강 (Health) 영향도
-        if "70시간" in text or "야근" in text or "피로" in text or "수면" in text:
+        # 3. 健康 (Health)
+        if any(k in text for k in ["70時間", "残業", "疲労", "徹夜", "야근", "수면부족"]):
             hea_score = -45
             hea_status = "NEGATIVE"
-            hea_reason = "수면 부채 급증 및 스트레스 지수 임계 도달. 번아웃 위험 극대화"
-        elif "산책" in text or "도보" in text or "운동" in text or "수면" in text:
+            hea_reason = "睡眠負債の急増およびストレス指数の限界到達。バーンアウトリスク大。"
+        elif any(k in text for k in ["散歩", "ランニング", "運動", "睡眠", "ウォーク", "산책"]):
             hea_score = +30
             hea_status = "POSITIVE"
-            hea_reason = "가벼운 유산소 보행으로 코르티솔 분비 감소 및 수면 질 향상"
-        elif "야식" in text or "폭식" in text:
+            hea_reason = "有酸素運動によるコルチゾール分泌抑制および睡眠の質向上。"
+        elif any(k in text for k in ["夜食", "過食", "暴飲暴食", "야식"]):
             hea_score = -25
             hea_status = "NEGATIVE"
-            hea_reason = "심야 고칼로리 섭취로 위장 부담 및 수면 리듬 교란"
+            hea_reason = "深夜の高カロリー摂取による胃腸負担および睡眠リズムの乱れ。"
         else:
-            hea_score = -5 if micro_deviation > 80000 else 0
+            hea_score = -5 if micro_deviation > 8000 else 0
             hea_status = "NEUTRAL"
-            hea_reason = "신체 항상성 상태 유지"
-
-        if locale == "en":
-            name = "Health"
-            if hea_score < -30: hea_reason = "Sleep debt surged, high burnout risk."
-            elif hea_score > 20: hea_reason = "Aerobic walk lowers cortisol, improves sleep."
-            elif hea_score < -10: hea_reason = "Late night eating disrupts sleep rhythm."
-            else: hea_reason = "Physical homeostasis maintained."
-        elif locale == "ja":
-            name = "健康"
-            if hea_score < -30: hea_reason = "睡眠負債の急増、バーンアウトリスク大。"
-            elif hea_score > 20: hea_reason = "有酸素運動による睡眠の質向上。"
-            elif hea_score < -10: hea_reason = "深夜の過食による睡眠リズムの乱れ。"
-            else: hea_reason = "身体の恒常性を維持。"
-        else:
-            name = "건강"
+            hea_reason = "身体の恒常性および健康状態を維持。"
 
         impacts.append({
             "category_id": "health",
-            "name": name,
+            "name": "健康",
             "icon": "🏃",
             "score": hea_score,
             "status": hea_status,
@@ -682,49 +624,32 @@ class GoalManager:
             "delta_label": f"{hea_score:+d}%"
         })
 
-        # 4. 가족 (Family) 영향도
-        if "주말 출근" in text or "70시간" in text:
+        # 4. 家族 (Family)
+        if any(k in text for k in ["週末出勤", "70時間", "休日出勤", "철야"]):
             fam_score = -50
             fam_status = "NEGATIVE"
-            fam_reason = "헌법 제1조 위반: 주당 가족 저녁 식사 3회 보장 원칙 영구 침해 위험"
-        elif "아내" in text or "남편" in text or "아이" in text or "가족" in text:
-            if micro_deviation > 80000 and "상의" not in text:
+            fam_reason = "憲法第1条違反: 週3回以上の家族夕食保障原則を侵害する危険性。"
+        elif any(k in text for k in ["妻", "夫", "子供", "家族", "夕食", "가족"]):
+            if micro_deviation > 8000 and "相談" not in text and "상의" not in text:
                 fam_score = -15
                 fam_status = "NEGATIVE"
-                fam_reason = "가계 공유 예산의 일방적 독단 소비로 인한 신뢰 저하 가능성"
+                fam_reason = "共有家計予算の独断消費による信頼低下の懸念。"
             else:
                 fam_score = +15
                 fam_status = "POSITIVE"
-                fam_reason = "가족과의 일상 교감 및 보너스 소식 공유"
-        elif "산책" in text:
+                fam_reason = "家族との日常的な交流および安心感の共有。"
+        elif any(k in text for k in ["散歩", "帰宅", "산책"]):
             fam_score = +10
             fam_status = "POSITIVE"
-            fam_reason = "귀가 전 감정 정돈을 통해 가정 내 평온한 소통 보장"
+            fam_reason = "帰宅前の感情調整による穏やかなコミュニケーションの確保。"
         else:
             fam_score = 0
             fam_status = "NEUTRAL"
-            fam_reason = "가족 일정에 유의미한 영향 없음"
-
-        if locale == "en":
-            name = "Family"
-            if fam_score < -30: fam_reason = "Violation of Constitution Article 1: Family dinner compromised."
-            elif fam_score < -10: fam_reason = "Unilateral expense causing trust issues."
-            elif fam_score > 10: fam_reason = "Sharing good news and emotional connection."
-            elif fam_score > 0: fam_reason = "Emotional regulation before arriving home."
-            else: fam_reason = "No significant impact on family."
-        elif locale == "ja":
-            name = "家族"
-            if fam_score < -30: fam_reason = "憲法第1条違反: 家族との夕食時間の侵害。"
-            elif fam_score < -10: fam_reason = "独断的な支出による信頼低下の可能性。"
-            elif fam_score > 10: fam_reason = "家族との交流と良い知らせの共有。"
-            elif fam_score > 0: fam_reason = "帰宅前の感情調整による穏やかなコミュニケーション。"
-            else: fam_reason = "家族の予定に有意な影響なし。"
-        else:
-            name = "가족"
+            fam_reason = "家族の予定に対する直接的な影響なし。"
 
         impacts.append({
             "category_id": "family",
-            "name": name,
+            "name": "家族",
             "icon": "👨‍👩‍👧",
             "score": fam_score,
             "status": fam_status,
@@ -732,42 +657,23 @@ class GoalManager:
             "delta_label": f"{fam_score:+d}%"
         })
 
-        # 5. 개인 취미 (Hobby) 영향도
-        if "키보드" in text or "음악" in text or "러닝" in text or "사진" in text or "취미" in text:
+        # 5. 個人の趣味 (Hobby)
+        if any(k in text for k in ["キーボード", "音楽", "ランニング", "写真", "趣味", "취미"]):
             hob_score = +35
             hob_status = "POSITIVE"
-            hob_reason = "개인 취미 몰입 장비/시간 확보로 자아실현 및 심리적 활력 충전"
-        elif "주말 출근" in text or "70시간" in text:
+            hob_reason = "個人の趣味没頭機材・時間の確保による自己実現および活力回復。"
+        elif any(k in text for k in ["週末出勤", "70時間", "休日出勤"]):
             hob_score = -40
             hob_status = "NEGATIVE"
-            hob_reason = "헌법 제1조 위반: 주당 개인 취미 4시간 쿼터 전면 박탈 위험"
-        elif "산책" in text:
-            hob_score = +25
-            hob_status = "POSITIVE"
-            hob_reason = "야간 도보 산책으로 주말 취미 활동(러닝/출사)을 위한 컨디션 방어"
+            hob_reason = "憲法第2条違反: 週4時間の個人趣味クォータ全剥奪の危機。"
         else:
             hob_score = 0
             hob_status = "NEUTRAL"
-            hob_reason = "취미 쿼터 유지"
-
-        if locale == "en":
-            name = "Personal Hobby"
-            if hob_score > 30: hob_reason = "Self-actualization through hobby equipment/time."
-            elif hob_score < -30: hob_reason = "Violation of Constitution Article 1: 4-hour hobby quota deprived."
-            elif hob_score > 20: hob_reason = "Condition maintenance for weekend hobbies."
-            else: hob_reason = "Hobby quota maintained."
-        elif locale == "ja":
-            name = "個人の趣味"
-            if hob_score > 30: hob_reason = "趣味の充実による自己実現と活力充電。"
-            elif hob_score < -30: hob_reason = "憲法第1条違反: 趣味の4時間枠が完全に奪われる危機。"
-            elif hob_score > 20: hob_reason = "週末の趣味活動に向けたコンディション維持。"
-            else: hob_reason = "趣味枠を維持。"
-        else:
-            name = "개인 취미"
+            hob_reason = "趣味時間への特筆すべき干渉なし。"
 
         impacts.append({
             "category_id": "hobby",
-            "name": name,
+            "name": "個人の趣味",
             "icon": "🎨",
             "score": hob_score,
             "status": hob_status,
@@ -775,7 +681,7 @@ class GoalManager:
             "delta_label": f"{hob_score:+d}%"
         })
 
-        # 6. 각 도메인별 Log-10 5단계 시계열 궤적(Temporal Trajectory) 부여
+        # 6. 各ドメイン別 Log-10 5段階時系列軌跡（Temporal Trajectory）付与
         for item in impacts:
             item["temporal_trajectory"] = self._build_horizon_trajectory(
                 cat_id=item["category_id"],
@@ -807,13 +713,13 @@ class GoalManager:
                 deltas = [0, 0, +10, +22, +15]
                 notes = _loc_list(
                     ["현금 흐름 당일 변동 없음", "오퍼 수락 및 계약서 검토 기간", "인상된 월급 3개월 적립으로 비상금 확충", "3년 내 시드머니 1억 조기 완제 (+11개월 단축)", "조기 시드머니 30년 복리 증식 가속 (+1.8억 추가 기대)"],
-                    ["キャッシュフロー当日変動なし", "オファー受諾および契約書検討期間", "増額給与の3ヶ月積立による非常資金拡充", "3年以内の種銭1億ウォン早期達成（+11ヶ月短縮）", "早期種銭の30年複利運用加速（+1.8億ウォン追加期待）"],
+                    ["キャッシュフロー当日変動なし", "オファー受諾および契約書検討期間", "増額給与の3ヶ月積立による非常資金拡充", "3年以内のシード資金1,000万円早期達成（+11ヶ月短縮）", "早期種銭の30年複利運用加速（+1,800万円追加期待）"],
                     ["No cash flow change today", "Offer review period", "Emergency buffer boosted by 3-month salary hike", "Seed 100M KRW completed 11 months early", "30-year compounding accelerated (+180M KRW expected)"]
                 )
                 arb_deltas = [0, 0, +6, +14, +12]
                 arb_notes = _loc_list(
                     ["현금 흐름 당일 변동 없음", "중재안: 주 52시간 상한 카운터오퍼 협상", "무리 없는 근무와 안정적 월급 적립", "3년 시드머니 1억 달성 (+7개월 단축)", "30년 평생 복리 자산 안정 증식"],
-                    ["キャッシュフロー当日変動なし", "仲裁案: 週52時間上限カウンターオファー交渉", "無理のない勤務と安定的給与積立", "3年で種銭1億ウォン達成（+7ヶ月短縮）", "30年生涯複利資産の安定成長"],
+                    ["キャッシュフロー当日変動なし", "仲裁案: 週52時間上限カウンターオファー交渉", "無理のない勤務と安定的給与積立", "3年でシード資金1,000万円達成（+7ヶ月短縮）", "30年生涯複利資産の安定成長"],
                     ["No cash flow change today", "Ruling: 52h cap counter-offer negotiation", "Sustainable workload and steady savings", "Seed 100M KRW achieved (+7 months faster)", "Lifetime compounding asset growth"]
                 )
             elif micro_deviation > user_budget:
@@ -821,13 +727,13 @@ class GoalManager:
                 deltas = [-drain, -int(drain * 0.8), -int(drain * 0.5), -int(drain * 0.3), -int(drain * 0.6)]
                 notes = _loc_list(
                     [f"일일 가처분 {user_budget:,.0f}원 한도 초과 (-{micro_deviation:,.0f}원)", "10일 완충재 긴급 차감 및 가처분 축소", "분기 저축률 소폭 저하", "중기 시드머니 형성 속도 둔화", "30년 복리 기회비용 잠식 (은퇴 지연 리스크)"],
-                    [f"1日可処分{user_budget:,.0f}ウォン限度額超過 (-{micro_deviation:,.0f}ウォン)", "10日バッファ緊急減額および可処分枠縮小", "四半期貯蓄率の微減", "中期シードマネー形成速度の鈍化", "30年複利機会費用の侵食（リタイア遅延リスク）"],
+                    [f"1日可処分{user_budget:,.0f}円限度額超過 (-{micro_deviation:,.0f}円)", "10日バッファ緊急減額および可処分枠縮小", "四半期貯蓄率の微減", "中期シードマネー形成速度の鈍化", "30年複利機会費用の侵食（リタイア遅延リスク）"],
                     [f"Exceeded daily budget of {user_budget:,.0f} (-{micro_deviation:,.0f})", "10-day buffer reduced", "Quarterly savings slowed", "Mid-term seed accumulation delayed", "30-year opportunity cost lost (delayed retirement)"]
                 )
                 arb_deltas = [-drain, -int(drain * 0.2), 0, 0, 0]
                 arb_notes = _loc_list(
                     [f"일일 가처분 한도 초과 (-{micro_deviation:,.0f}원)", "중재 판결: 3일간 외식비 절감(일 32,600원)으로 L1 내 완전 흡수", "분기 비상금 목표 100% 정상 보존", "3년 시드머니 누수 완전 차단", "30년 복리 은퇴 자산 무손실 방어 (은퇴 지연 0일)"],
-                    [f"1日可処有限度超過 (-{micro_deviation:,.0f}ウォン)", "仲裁判定: 3日間の外食費削減（日32,600ウォン）でL1内完全吸収", "四半期非常資金目標の100%正常保全", "3年シードマネー漏出の完全遮断", "30年複利リタイア資産の無損失防御（リタイア遅延0日）"],
+                    [f"1日可処有限度超過 (-{micro_deviation:,.0f}円)", "仲裁判定: 3日間の外食費削減（日3,200円）でL1内完全吸収", "四半期非常資金目標の100%正常保全", "3年シードマネー漏出の完全遮断", "30年複利リタイア資産の無損失防御（リタイア遅延0日）"],
                     [f"Exceeded daily budget (-{micro_deviation:,.0f})", "Compromise: 3-day dining saving absorbs L1 impact", "100% quarterly buffer preserved", "Seed capital leakage prevented", "Zero retirement delay preserved"]
                 )
             elif micro_deviation > 0:

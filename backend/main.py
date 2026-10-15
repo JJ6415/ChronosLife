@@ -259,6 +259,7 @@ class AnalyzeRequest(BaseModel):
 class UpdateGoalRequest(BaseModel):
     goal_id: str
     updates: Dict[str, Any]
+    locale: Optional[str] = "ja"
 
 
 class AiGenerateGoalRequest(BaseModel):
@@ -339,7 +340,7 @@ async def get_goals(locale: Optional[str] = "ja"):
 async def update_goal(req: UpdateGoalRequest):
     """특정 목표 갱신"""
     try:
-        updated = goal_manager.update_goal(req.goal_id, req.updates)
+        updated = goal_manager.update_goal(req.goal_id, req.updates, locale=req.locale or "ja")
         return {"status": "ok", "goal": updated}
     except Exception as e:
         logger.error(f"Error updating goal: {e}")
@@ -556,8 +557,8 @@ async def analyze(req: AnalyzeRequest):
         )
 
         # 3. Log-10 Cascade (수학적 모델 삭제됨)
-        user_profile = goal_manager.get_user_profile()
-        effective_daily_budget = req.daily_budget if req.daily_budget is not None else user_profile.get("daily_budget", 40000.0)
+        user_profile = goal_manager.get_user_profile(locale=req.locale or "ja")
+        effective_daily_budget = req.daily_budget if req.daily_budget is not None else user_profile.get("daily_budget", 4000.0)
         user_profile["daily_budget"] = effective_daily_budget
         user_profile["state_dynamics"] = state_result
         
@@ -647,7 +648,7 @@ async def analyze(req: AnalyzeRequest):
         ) or bool(state_result.get("anomaly_triggers"))
         if has_mobility_trigger or req.scenario_id == "scenario_3_burnout_mobility":
             try:
-                ekispert_prescription = ekispert_client.generate_healing_walk_prescription(locale=req.locale or "ko")
+                ekispert_prescription = ekispert_client.generate_healing_walk_prescription(locale=req.locale or "ja")
             except Exception as eke:
                 logger.warning(f"Ekispert prescription generation error: {eke}")
 
@@ -995,7 +996,7 @@ async def analyze_stream(req: AnalyzeRequest):
             ) or bool(state_result.get("anomaly_triggers"))
             if has_mobility_trigger or req.scenario_id == "scenario_3_burnout_mobility":
                 try:
-                    ekispert_data = ekispert_client.generate_healing_walk_prescription(locale=req.locale or "ko")
+                    ekispert_data = ekispert_client.generate_healing_walk_prescription(locale=req.locale or "ja")
                 except Exception as eke:
                     logger.warning(f"Ekispert prescription generation error in stream: {eke}")
 
