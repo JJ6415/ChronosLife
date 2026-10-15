@@ -262,13 +262,16 @@ class GoalManager:
         self, 
         message: str, 
         history: List[Dict[str, str]] = None,
-        preferred_model: Optional[str] = None
+        preferred_model: Optional[str] = None,
+        locale: Optional[str] = "ja"
     ) -> Dict[str, Any]:
         """
         AI 인생 헌법 설계관과 1:1 대화를 통해 5대 인생 목표와 헌법을 실시간으로 함께 정립/수정합니다.
+        다국어(ja, ko, en) 및 엔화(円) 단위를 완벽히 지원합니다.
         """
         use_mock = os.environ.get("USE_MOCK_FALLBACK", "True").lower() in ("true", "1", "yes")
         api_key = os.environ.get("GEMINI_API_KEY")
+        loc = (locale or "ja").lower()
 
         if not use_mock and api_key:
             try:
@@ -281,37 +284,95 @@ class GoalManager:
 
                 history_str = ""
                 if history:
-                    history_str = "\n[이전 대화 맥락]:\n" + "\n".join([f"- {h.get('role', 'user')}: {h.get('content', '')}" for h in history[-4:]])
+                    history_str = "\n[Previous Conversation Context]:\n" + "\n".join([f"- {h.get('role', 'user')}: {h.get('content', '')}" for h in history[-4:]])
 
-                prompt = f"""
-                당신은 ChronosLife의 '수석 인생 헌법 설계관(Chief Constitution Architect AI, Gemini)'입니다.
-                사용자와 따뜻하고 지혜로운 대화를 나누며, 30년을 지탱할 5대 도메인(재정, 커리어, 건강, 가족, 개인 취미)의 인생 목표와 제1조~제5조 불변의 헌법 조항을 함께 설계합니다.
+                if loc == "ja":
+                    prompt = f"""
+                    あなたはChronosLifeの『首席人生憲法設計官（Chief Constitution Architect AI, Gemini）』です。
+                    ユーザーと温かく賢明な対話を交わし、30年の人生を支える5大領域（財務、キャリア、健康、家族、個人の趣味）の人生目標と第1条〜第5条の不変の憲法条項を共に設計します。
 
-                [현재 5대 헌법 & 목표 현황]:
-                {current_state_str}
-                {history_str}
-                [사용자의 최신 발화]:
-                "{message}"
+                    [現在の5大憲法＆目標現況]:
+                    {current_state_str}
+                    {history_str}
+                    [ユーザーの最新発話]:
+                    "{message}"
 
-                [작성 지침]:
-                1. 이전 대화 맥락과 최신 발화를 종합적으로 고려하여 깊이 공감하고, 라이프 거버넌스 전문가로서 통찰력 있는 조언과 함께 질문을 던지세요.
-                2. 사용자의 발화에 맞추어 5대 목표(family, hobby, health, career, finance) 중 개선할 도메인 1개 이상의 구체적인 목표와 규칙, 헌법 조항을 제안하세요. (반드시 사용자의 말에 맞춰 'title', 'target_value', 'rule', 'tenet' 내용을 새롭게 작성해야 함)
-                3. **가장 중요**: 사용자가 이어서 AI에게 던질 법한 [맥락 기반 후속 질문 3개 (suggested_next_prompts)]를 실시간으로 직접 고안하여 제공하세요. (고정된 문구가 아니라 방금 나눈 대화에 꼬리를 무는 질문이어야 함)
-                4. 반드시 아래 JSON 형식으로만 반환하세요:
-                {{
-                    "reply": "사용자에게 전하는 따뜻하고 통찰력 있는 대화형 응답 (2~4문장)",
-                    "suggested_goals": {{
-                        // 변경이 필요한 도메인 (예: health 또는 hobby 등)
-                        // 형식: "category_key": {{"title": "구체적인 새 목표명", "target_value": "수치", "rule": "통제 룰", "tenet": "제N조 (...): 헌법 내용"}}
-                    }},
-                    "focus_category": "family|hobby|health|career|finance",
-                    "suggested_next_prompts": [
-                        "방금 대화 맥락에 맞춘 사용자의 후속 질문 1",
-                        "방금 대화 맥락에 맞춘 사용자의 후속 질문 2",
-                        "방금 대화 맥락에 맞춘 사용자의 후속 질문 3"
-                    ]
-                }}
-                """
+                    [作成指針]:
+                    1. 前の対話文脈と最新の発話を総合的に考慮し、深く共感し、ライフガバナンス専門家として洞察に満ちた助言と共に問いを投げかけてください。
+                    2. ユーザーの発話に合わせて、5大目標（family, hobby, health, career, finance）のうち改善すべき領域1つ以上の具体的な目標、ルール、憲法条項を提案してください。（必ずユーザーの言葉に合わせて 'title', 'target_value', 'rule', 'tenet' の内容を日本語で新しく作成すること。通貨単位は日本円「円」「万円」を使用）
+                    3. **最重要**: ユーザーが続いてAIに投げかけそうな【文脈連動のフォローアップ質問3つ (suggested_next_prompts)】をリアルタイムで直接考案して日本語で提供してください。
+                    4. 必ず以下のJSON形式のみで返してください:
+                    {{
+                        "reply": "ユーザーに伝える温かく洞察に満ちた対話型応答（2〜4文、日本語）",
+                        "suggested_goals": {{
+                            "category_key": {{"title": "具体的な新目標名", "target_value": "数値（円/時間等）", "rule": "制御ルール", "tenet": "第N条 (...): 憲法内容"}}
+                        }},
+                        "focus_category": "family|hobby|health|career|finance",
+                        "suggested_next_prompts": [
+                            "文脈に沿ったユーザーのフォローアップ質問1（日本語）",
+                            "文脈に沿ったユーザーのフォローアップ質問2（日本語）",
+                            "文脈に沿ったユーザーのフォローアップ質問3（日本語）"
+                        ]
+                    }}
+                    """
+                elif loc == "en":
+                    prompt = f"""
+                    You are ChronosLife's Chief Constitution Architect AI (Gemini).
+                    Engage in a warm and wise dialogue with the user to co-design 30-year life goals and immutable constitutional tenets across 5 domains (finance, career, health, family, hobby).
+
+                    [Current 5 Constitutional Goals]:
+                    {current_state_str}
+                    {history_str}
+                    [User's Latest Statement]:
+                    "{message}"
+
+                    [Guidelines]:
+                    1. Empathize deeply and advise as a life governance expert with insightful follow-up questions.
+                    2. Suggest concrete updates for at least 1 domain among (family, hobby, health, career, finance) with title, target_value, rule, tenet.
+                    3. Formulate 3 dynamic contextual suggested follow-up prompts for the user.
+                    4. Return ONLY the following JSON format:
+                    {{
+                        "reply": "Warm and insightful conversational reply (2-4 sentences in English)",
+                        "suggested_goals": {{
+                            "category_key": {{"title": "New Goal Title", "target_value": "Metric", "rule": "Rule", "tenet": "Article N (...)"}}
+                        }},
+                        "focus_category": "family|hobby|health|career|finance",
+                        "suggested_next_prompts": [
+                            "Follow-up question 1 in English",
+                            "Follow-up question 2 in English",
+                            "Follow-up question 3 in English"
+                        ]
+                    }}
+                    """
+                else:
+                    prompt = f"""
+                    당신은 ChronosLife의 '수석 인생 헌법 설계관(Chief Constitution Architect AI, Gemini)'입니다.
+                    사용자와 따뜻하고 지혜로운 대화를 나누며, 30년을 지탱할 5대 도메인(재정, 커리어, 건강, 가족, 개인 취미)의 인생 목표와 제1조~제5조 불변의 헌법 조항을 함께 설계합니다.
+
+                    [현재 5대 헌법 & 목표 현황]:
+                    {current_state_str}
+                    {history_str}
+                    [사용자의 최신 발화]:
+                    "{message}"
+
+                    [작성 지침]:
+                    1. 이전 대화 맥락과 최신 발화를 종합적으로 고려하여 깊이 공감하고, 라이프 거버넌스 전문가로서 통찰력 있는 조언과 함께 질문을 던지세요.
+                    2. 사용자의 발화에 맞추어 5대 목표(family, hobby, health, career, finance) 중 개선할 도메인 1개 이상의 구체적인 목표와 규칙, 헌법 조항을 제안하세요. (반드시 사용자의 말에 맞춰 'title', 'target_value', 'rule', 'tenet' 내용을 새롭게 작성해야 함)
+                    3. **가장 중요**: 사용자가 이어서 AI에게 던질 법한 [맥락 기반 후속 질문 3개 (suggested_next_prompts)]를 실시간으로 직접 고안하여 제공하세요.
+                    4. 반드시 아래 JSON 형식으로만 반환하세요:
+                    {{
+                        "reply": "사용자에게 전하는 따뜻하고 통찰력 있는 대화형 응답 (2~4문장)",
+                        "suggested_goals": {{
+                            "category_key": {{"title": "구체적인 새 목표명", "target_value": "수치", "rule": "통제 룰", "tenet": "제N조 (...): 헌법 내용"}}
+                        }},
+                        "focus_category": "family|hobby|health|career|finance",
+                        "suggested_next_prompts": [
+                            "방금 대화 맥락에 맞춘 사용자의 후속 질문 1",
+                            "방금 대화 맥락에 맞춘 사용자의 후속 질문 2",
+                            "방금 대화 맥락에 맞춘 사용자의 후속 질문 3"
+                        ]
+                    }}
+                    """
 
                 parsed = None
                 models_to_try = []
@@ -345,14 +406,28 @@ class GoalManager:
 
                 dynamic_prompts = parsed.get("suggested_next_prompts", [])
                 if not dynamic_prompts:
-                    dynamic_prompts = [
-                        "가족 저녁 식사를 위한 평일 19시 노티 차단 규칙도 넣어줄래?",
-                        "주말 취미 4시간 쿼터를 위해 주말 출근 절대 금지 조항을 추가해줘.",
-                        "현재 내 월급에서 30년 복리 10억을 달성하려면 매달 얼마를 모아야 해?"
-                    ]
+                    if loc == "ja":
+                        dynamic_prompts = [
+                            "家族の夕食を確保するため平日19時以降の通知ブロックルールを追加できる？",
+                            "週末の趣味4時間枠を守るため休日の業務連絡完全禁止条項を入れてほしい。",
+                            "現在の月給から30年複利で1億円の資産を作るには毎月いくら貯蓄が必要？"
+                        ]
+                    elif loc == "en":
+                        dynamic_prompts = [
+                            "Can you add a 7 PM notification block rule for family dinners?",
+                            "Add an absolute ban on weekend work contacts to protect my 4-hour hobby block.",
+                            "How much do I need to save monthly to achieve $1M in 30 years with compound interest?"
+                        ]
+                    else:
+                        dynamic_prompts = [
+                            "가족 저녁 식사를 위한 평일 19시 노티 차단 규칙도 넣어줄래?",
+                            "주말 취미 4시간 쿼터를 위해 주말 출근 절대 금지 조항을 추가해줘.",
+                            "현재 내 월급에서 30년 복리 10억을 달성하려면 매달 얼마를 모아야 해?"
+                        ]
 
+                default_reply = "目標を調整しました。" if loc == "ja" else ("Goal adjusted successfully." if loc == "en" else "목표를 성공적으로 조율했습니다.")
                 return {
-                    "reply": parsed.get("reply", "목표를 성공적으로 조율했습니다."),
+                    "reply": parsed.get("reply", default_reply),
                     "updated_goals": self.goals,
                     "focus_category": parsed.get("focus_category", "general"),
                     "suggested_next_prompts": dynamic_prompts
@@ -363,56 +438,102 @@ class GoalManager:
 
         # ── Mock 대화 코칭 로직 (키가 없거나 실패 시) ──
         lower = message.lower()
-        reply = "말씀해주신 가치관을 깊이 새겨들었습니다. 일과 삶의 균형을 위해 어떤 영역을 가장 먼저 보호하고 싶으신가요?"
-        focus = "general"
-        dynamic_prompts = [
-            "가족 저녁 식사 주 3회를 위한 퇴근 시간 강제 락을 걸고 싶어.",
-            "주말 러닝과 개인 취미를 위한 4시간 쿼터 헌법을 세워줘.",
-            "야근을 줄이면 기대 연봉이 낮아질 수 있는데 재정 밸런스는 어떻게 맞춰?"
-        ]
-
-        if "가족" in lower or "아이" in lower or "아내" in lower or "남편" in lower:
-            reply = "가족과의 일상은 한 번 지나가면 다시 오지 않는 가장 소중한 시간입니다. 아무리 바쁜 프로젝트라도 주당 최소 3회의 가족 저녁 식사를 '절대 불가침 헌법 제1조'로 못 박아둘 것을 제안합니다. 동의하시나요?"
-            focus = "family"
-            self.goals["family"]["title"] = "가족 저녁 식사 주 3회 절대 사수 및 주말 온전한 동행"
-            self.goals["family"]["rule"] = "평일 19시 이후 업무 알림 차단, 주말 가족 일정 최우선"
+        if loc == "ja":
+            reply = "お話しいただいた価値観を真摯に受け止めました。ワークライフバランスを守るため、どの領域を最優先で保護したいですか？"
+            focus = "general"
             dynamic_prompts = [
-                "평일 19시 이후 업무 메신저 알림을 강제로 끄는 제약 룰을 추가해줘.",
-                "만약 주중에 야근이 생기면 주말 점심으로 식사를 대체하는 예외 룰은 어떨까?",
-                "가족과의 여행을 위해 분기별 1회 주말 락다운 조항도 만들어줘."
+                "週3回の家族の夕食を守るため、退社時間の強制ロックをかけたい。",
+                "週末のランニングと個人趣味のための4時間クォータ憲法を立ててほしい。",
+                "残業を減らして年収を維持しながら財務バランスを取るにはどうすればいい？"
             ]
 
-        elif "취미" in lower or "러닝" in lower or "음악" in lower or "악기" in lower or "운동" in lower:
-            reply = "개인 취미는 단순한 여가가 아니라 번아웃을 방어하는 자아의 산소호흡기입니다! 주당 최소 4시간의 '개인 취미 잠금 쿼터'를 헌법 제2조로 지정하여 업무 스트레스를 해소하도록 업데이트했습니다. 현재 하고 계신 취미 활동을 더 알려주시겠어요?"
-            focus = "hobby"
-            self.goals["hobby"]["title"] = "주말 개인 취미 몰입 4시간 강제 쿼터 (러닝·창작·재충전)"
-            self.goals["hobby"]["rule"] = "주말 오전 취미 블록 설정 시 모든 업무 연락 수신 거부"
+            if any(k in lower for k in ["家族", "子供", "妻", "夫", "夕食", "かぞく"]):
+                reply = "家族との時間は一度過ぎると二度と戻らない最も尊い財産です。どんなに多忙なプロジェクトでも週3回以上の家族夕食を『絶対不可侵憲法第1条』として刻み込むことを提案します。同意されますか？"
+                focus = "family"
+                self.goals["family"]["title"] = "週3回以上の家族夕食厳守と週末の完全な同行"
+                self.goals["family"]["rule"] = "平日19時以降の業務通知遮断、週末家族イベント最優先"
+                dynamic_prompts = [
+                    "平日19時以降のビジネスチャット通知を強制オフにする制約ルールを追加して。",
+                    "週に一度残業が発生したら週末ランチで代替する例外ルールはどう？",
+                    "家族旅行のために四半期に一度の週末完全オフ条項を作ってほしい。"
+                ]
+            elif any(k in lower for k in ["趣味", "ランニング", "音楽", "楽器", "運動", "しゅみ"]):
+                reply = "個人の趣味は単なる余暇ではなく、バーンアウトを防ぐ心の酸素ボンベです！週4時間の『趣味専用ロック枠』を憲法第2条に指定しました。現在行っている趣味についてもっと詳しく教えていただけますか？"
+                focus = "hobby"
+                self.goals["hobby"]["title"] = "週末個人趣味への没頭4時間強制枠（ランニング・創作）"
+                self.goals["hobby"]["rule"] = "週末午前の趣味ブロック設定時はすべての業務連絡を拒否"
+                dynamic_prompts = [
+                    "趣味の機材購入費用をL1（10日）バッファーで吸収する条件は？",
+                    "週末午前に2時間のランニングブロックを確保するためカレンダーをロックしたい。",
+                    "趣味活動を維持するための1日7時間睡眠連動憲法も整えて。"
+                ]
+            elif any(k in lower for k in ["残業", "健康", "睡眠", "疲労", "つかれ", "ねむり"]):
+                reply = "持続可能な成長は健康な身体があってこそです。連続3日以上の残業を防ぎ、1日7時間睡眠を死守する憲法第3条を策定しました。最近の平均睡眠時間は何時間ほどですか？"
+                focus = "health"
+                self.goals["health"]["title"] = "1日7時間睡眠の確保と連続残業の防止"
+                self.goals["health"]["rule"] = "22時以降の業務禁止および就寝前のスマートフォン遮断"
+                dynamic_prompts = [
+                    "連続3日の残業が検知されたらEkispert 15分徒歩散歩チケットを強制発行するルールを追加して。",
+                    "睡眠負債が5時間以上蓄積した際に出勤を1時間遅らせるバッファールールがほしい。",
+                    "深夜の衝動的な夜食注文を物理的に防ぐ財務ガードレールはどう立てる？"
+                ]
+            elif any(k in lower for k in ["金", "引退", "財務", "投資", "年収", "貯蓄", "資産", "円"]):
+                reply = "経済的自立は真の自由の基盤です。1日の可処分予算3,000円を守りながら、30年複利で1億円の資産を築く軌跡を憲法第5条として整えました。目標とする引退時期はいつ頃とお考えですか？"
+                focus = "finance"
+                self.goals["finance"]["title"] = "30年複利1億円の引退資産および3年でシード資金1,000万円達成"
+                dynamic_prompts = [
+                    "毎月10万円ずつ貯蓄・投資したときの30年複利（年利6%）の最終資産は？",
+                    "予期せぬ大きな出費が発生した際にL2（100日）緊急資金で吸収する条件は？",
+                    "年収350万円アップの転職提案が来た際に家族の時間を損なわずに交渉するガイドラインを。"
+                ]
+        else:
+            reply = "말씀해주신 가치관을 깊이 새겨들었습니다. 일과 삶의 균형을 위해 어떤 영역을 가장 먼저 보호하고 싶으신가요?"
+            focus = "general"
             dynamic_prompts = [
-                "취미 장비 구매 비용은 L1(10일) 완충재 내에서 어떻게 허용할 수 있어?",
-                "주말 오전에 2시간씩 러닝 블록을 방해받지 않도록 캘린더를 잠그고 싶어.",
-                "취미 활동을 지속하기 위한 일일 수면 7시간 연계 헌법도 다듬어줘."
+                "가족 저녁 식사 주 3회를 위한 퇴근 시간 강제 락을 걸고 싶어.",
+                "주말 러닝과 개인 취미를 위한 4시간 쿼터 헌법을 세워줘.",
+                "야근을 줄이면 기대 연봉이 낮아질 수 있는데 재정 밸런스는 어떻게 맞춰?"
             ]
 
-        elif "야근" in lower or "건강" in lower or "수면" in lower or "피로" in lower:
-            reply = "지속 가능한 성장은 건강한 신체에서만 나옵니다. 연속 3일 야근을 방어하고 일일 수면 7시간을 사수하는 헌법 제3조를 수립했습니다. 최근 수면 시간은 대략 몇 시간 정도 유지되고 계신가요?"
-            focus = "health"
-            self.goals["health"]["title"] = "일일 7시간 수면 확보 및 연속 야근 차단"
-            self.goals["health"]["rule"] = "22시 이후 업무 금지 및 취침 전 스마트폰 차단"
-            dynamic_prompts = [
-                "연속 3일 야근이 감지되면 Ekispert 15분 도보 산책 티켓을 강제 발급하는 룰을 넣어줘.",
-                "수면 부채가 5시간 이상 누적되었을 때 출근 시간을 1시간 늦추는 완충 룰이 필요해.",
-                "야간 충동 야식 배달 주문을 물리적으로 차단하는 재정 가드레일은 어떻게 세워?"
-            ]
-
-        elif "돈" in lower or "은퇴" in lower or "재정" in lower or "시드" in lower or "연봉" in lower:
-            reply = "재정적 자립은 진정한 자유의 토대입니다. 일일 가처분 4만 원 한도를 지키면서 30년 복리로 10억 은퇴 자산을 만드는 궤적을 헌법 제5조로 다듬었습니다. 현재 생각하시는 목표 은퇴 시점은 언제인가요?"
-            focus = "finance"
-            self.goals["finance"]["title"] = "30년 복리 10억 은퇴 자산 및 3년 시드머니 1억 달성"
-            dynamic_prompts = [
-                "매월 100만 원씩 저축할 때 30년 복리 연 6% 수익률이면 최종 얼마가 모여?",
-                "예상치 못한 목돈 지출이 생겼을 때 L2(100일) 비상금으로 흡수하는 조건은?",
-                "연봉 3,500만 원 인상 제안이 왔을 때 가족 시간을 침해하지 않고 협상하는 가이드를 줘."
-            ]
+            if "가족" in lower or "아이" in lower or "아내" in lower or "남편" in lower:
+                reply = "가족과의 일상은 한 번 지나가면 다시 오지 않는 가장 소중한 시간입니다. 아무리 바쁜 프로젝트라도 주당 최소 3회의 가족 저녁 식사를 '절대 불가침 헌법 제1조'로 못 박아둘 것을 제안합니다. 동의하시나요?"
+                focus = "family"
+                self.goals["family"]["title"] = "가족 저녁 식사 주 3회 절대 사수 및 주말 온전한 동행"
+                self.goals["family"]["rule"] = "평일 19시 이후 업무 알림 차단, 주말 가족 일정 최우선"
+                dynamic_prompts = [
+                    "평일 19시 이후 업무 메신저 알림을 강제로 끄는 제약 룰을 추가해줘.",
+                    "만약 주중에 야근이 생기면 주말 점심으로 식사를 대체하는 예외 룰은 어떨까?",
+                    "가족과의 여행을 위해 분기별 1회 주말 락다운 조항도 만들어줘."
+                ]
+            elif "취미" in lower or "러닝" in lower or "음악" in lower or "악기" in lower or "운동" in lower:
+                reply = "개인 취미는 단순한 여가가 아니라 번아웃을 방어하는 자아의 산소호흡기입니다! 주당 최소 4시간의 '개인 취미 잠금 쿼터'를 헌법 제2조로 지정하여 업무 스트레스를 해소하도록 업데이트했습니다. 현재 하고 계신 취미 활동을 더 알려주시겠어요?"
+                focus = "hobby"
+                self.goals["hobby"]["title"] = "주말 개인 취미 몰입 4시간 강제 쿼터 (러닝·창작·재충전)"
+                self.goals["hobby"]["rule"] = "주말 오전 취미 블록 설정 시 모든 업무 연락 수신 거부"
+                dynamic_prompts = [
+                    "취미 장비 구매 비용은 L1(10일) 완충재 내에서 어떻게 허용할 수 있어?",
+                    "주말 오전에 2시간씩 러닝 블록을 방해받지 않도록 캘린더를 잠그고 싶어.",
+                    "취미 활동을 지속하기 위한 일일 수면 7시간 연계 헌법도 다듬어줘."
+                ]
+            elif "야근" in lower or "건강" in lower or "수면" in lower or "피로" in lower:
+                reply = "지속 가능한 성장은 건강한 신체에서만 나옵니다. 연속 3일 야근을 방어하고 일일 수면 7시간을 사수하는 헌법 제3조를 수립했습니다. 최근 수면 시간은 대략 몇 시간 정도 유지되고 계신가요?"
+                focus = "health"
+                self.goals["health"]["title"] = "일일 7시간 수면 확보 및 연속 야근 차단"
+                self.goals["health"]["rule"] = "22시 이후 업무 금지 및 취침 전 스마트폰 차단"
+                dynamic_prompts = [
+                    "연속 3일 야근이 감지되면 Ekispert 15분 도보 산책 티켓을 강제 발급하는 룰을 넣어줘.",
+                    "수면 부채가 5시간 이상 누적되었을 때 출근 시간을 1시간 늦추는 완충 룰이 필요해.",
+                    "야간 충동 야식 배달 주문을 물리적으로 차단하는 재정 가드레일은 어떻게 세워?"
+                ]
+            elif "돈" in lower or "은퇴" in lower or "재정" in lower or "시드" in lower or "연봉" in lower:
+                reply = "재정적 자립은 진정한 자유의 토대입니다. 일일 가처분 4만 원 한도를 지키면서 30년 복리로 10억 은퇴 자산을 만드는 궤적을 헌법 제5조로 다듬었습니다. 현재 생각하시는 목표 은퇴 시점은 언제인가요?"
+                focus = "finance"
+                self.goals["finance"]["title"] = "30년 복리 10억 은퇴 자산 및 3년 시드머니 1억 달성"
+                dynamic_prompts = [
+                    "매월 100만 원씩 저축할 때 30년 복리 연 6% 수익률이면 최종 얼마가 모여?",
+                    "예상치 못한 목돈 지출이 생겼을 때 L2(100일) 비상금으로 흡수하는 조건은?",
+                    "연봉 3,500만 원 인상 제안이 왔을 때 가족 시간을 침해하지 않고 협상하는 가이드를 줘."
+                ]
 
         return {
             "reply": reply,

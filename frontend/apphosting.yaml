@@ -16,6 +16,11 @@ env:
     availability:
       - BUILD
       - RUNTIME
+  - variable: NEXT_PUBLIC_WS_URL
+    value: wss://chronoslife-backend-27246861924.asia-northeast1.run.app/ws/gemini-live
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: NODE_ENV
     value: production
     availability:

@@ -416,6 +416,25 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
     return () => clearInterval(interval);
   }, [isListening, isSpeaking]);
 
+  // ── Gemini 3.8 Live WebSocket URL 동적 계산 (Cloud Run wss:// 자동 지원) ──
+  const getWsUrl = () => {
+    if (process.env.NEXT_PUBLIC_WS_URL) {
+      const base = process.env.NEXT_PUBLIC_WS_URL;
+      return base.includes('?') ? `${base}&locale=${locale}` : `${base}?locale=${locale}`;
+    }
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (apiUrl && apiUrl.startsWith('http')) {
+      const wsProtocol = apiUrl.startsWith('https') ? 'wss:' : 'ws:';
+      const cleanHost = apiUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      return `${wsProtocol}//${cleanHost}/ws/gemini-live?locale=${locale}`;
+    }
+    if (typeof window !== 'undefined') {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      return `${protocol}//${window.location.hostname}:8080/ws/gemini-live?locale=${locale}`;
+    }
+    return `ws://localhost:8080/ws/gemini-live?locale=${locale}`;
+  };
+
   // ── Gemini 3.8 Live WebSocket 연결 관리 ──
   const connectGeminiLiveWs = () => {
     if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) {
@@ -423,8 +442,7 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
     }
 
     try {
-      const host = typeof window !== 'undefined' ? (window.location.hostname || '127.0.0.1') : '127.0.0.1';
-      const wsUrl = process.env.NEXT_PUBLIC_WS_URL || `ws://${host}:8080/ws/gemini-live`;
+      const wsUrl = getWsUrl();
       setLiveWsStatus('connecting');
 
       const ws = new WebSocket(wsUrl);
@@ -432,7 +450,7 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
 
       ws.onopen = () => {
         setLiveWsStatus('connected');
-        console.log('🎙️ Gemini 3.8 Live WebSocket connected.');
+        console.log('🎙️ Gemini 3.8 Live WebSocket connected to:', wsUrl);
       };
 
       ws.onmessage = async (event) => {
@@ -441,7 +459,10 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
 
           if (data.type === 'session_connected') {
             setLiveWsStatus('connected');
-            setLiveTranscript(data.message || 'Gemini 3.8 Live 세션이 연결되었습니다. 말씀하세요.');
+            const defaultMsg = locale === 'ja'
+              ? 'Gemini 3.8 Live API セッションが接続されました。お話しください。'
+              : (locale === 'en' ? 'Gemini 3.8 Live session connected. Speak freely.' : 'Gemini 3.8 Live 세션이 연결되었습니다. 말씀하세요.');
+            setLiveTranscript(data.message || defaultMsg);
           } else if (data.type === 'audio_chunk') {
             // 네이티브 PCM 오디오 청크 큐잉 및 실시간 스케줄링 재생
             playNativePcmChunk(data.data);
@@ -455,7 +476,10 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
               if (!isSpeakingRef.current) {
                 setIsSpeaking(false);
                 isSpeakingRef.current = false;
-                setLiveTranscript('🎙️ 듣고 있습니다. 계속해서 다음 가치관이나 생각을 말씀하세요!');
+                const listenMsg = locale === 'ja'
+                  ? '🎙️ 聞いています。続けて次の価値観や考えをお話しください！'
+                  : (locale === 'en' ? '🎙️ Listening. Continue speaking!' : '🎙️ 듣고 있습니다. 계속해서 다음 가치관이나 생각을 말씀하세요!');
+                setLiveTranscript(listenMsg);
               }
             }, 1000);
           } else if (data.type === 'goal_updated') {
@@ -464,14 +488,19 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
               setGoals(data.all_goals);
             }
             setLastFocusCategory(data.category);
-            const notice = data.message || `Gemini 3.8 Live가 [${data.category.toUpperCase()}] 헌법을 실시간 갱신했습니다.`;
+            const notice = data.message || (
+              locale === 'ja'
+                ? `Gemini 3.8 Liveが[${data.category.toUpperCase()}]憲法をリアルタイム更新しました。`
+                : `Gemini 3.8 Live가 [${data.category.toUpperCase()}] 헌법을 실시간 갱신했습니다.`
+            );
             setSaveMessage(notice);
 
             // 대화 히스토리에 헌법 수립 카드 자동 누적
+            const cardPrefix = locale === 'ja' ? `🎯 [${data.category.toUpperCase()} 憲法確立]` : `🎯 [${data.category.toUpperCase()} 헌법 확립]`;
             const assistantMsg: ChatMessage = {
               id: Date.now().toString(),
               role: 'assistant',
-              content: `🎯 [${data.category.toUpperCase()} 헌법 확립] "${data.goal?.title || ''}" - ${data.goal?.tenet || ''}`,
+              content: `${cardPrefix} "${data.goal?.title || ''}" - ${data.goal?.tenet || ''}`,
               timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
               focusCategory: data.category,
               mode: 'voice'
@@ -496,12 +525,12 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
         console.log('🎙️ Gemini Live WS closed.');
         // 라이브 모드가 활성화되어 있다면 자동으로 재연결을 시도하여 연속 대화 보장
         if (isLiveActiveRef.current) {
-          console.log('🎙️ Live mode active, auto-reconnecting Gemini Live WS in 800ms...');
+          console.log('🎙️ Live mode active, auto-reconnecting Gemini Live WS in 1500ms...');
           setTimeout(() => {
             if (isLiveActiveRef.current) {
               connectGeminiLiveWs();
             }
-          }, 800);
+          }, 1500);
         }
       };
     } catch (err) {
@@ -527,8 +556,9 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
         bytes[i] = binaryString.charCodeAt(i);
       }
 
-      // 16비트 Signed PCM -> Float32
-      const int16Array = new Int16Array(bytes.buffer);
+      // 16비트 Signed PCM 정렬 보장 -> Float32 변환
+      const alignedLength = len - (len % 2);
+      const int16Array = new Int16Array(bytes.buffer, bytes.byteOffset, alignedLength / 2);
       const float32Array = new Float32Array(int16Array.length);
       for (let i = 0; i < int16Array.length; i++) {
         float32Array[i] = int16Array[i] / 32768.0;
@@ -735,7 +765,7 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
       }
     }
 
-    // 2. WebSocket 연결 불가 시에만 HTTP API 폴백 (단, Live 모드에선 기계음 TTS 절대 금지!)
+    // 2. WebSocket 연결 불가 시에만 HTTP API 폴백
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
       const res = await fetch(`${apiUrl}/api/goals/live-voice`, {
@@ -744,7 +774,7 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
         body: JSON.stringify({ 
           voice_transcript: voiceText,
           history: messages.slice(-6).map(m => ({ role: m.role, content: m.content })),
-          model_name: 'gemini-3.8-live',
+          model_name: 'gemini-3.5-flash-lite',
           locale: locale
         })
       });
@@ -752,7 +782,10 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
       if (!res.ok) throw new Error('Live 음성 통신 실패');
 
       const data = await res.json();
-      const reply = data.voice_reply || data.reply || '당신의 가치관에 맞춰 헌법을 실시간 갱신했습니다.';
+      const defaultReply = locale === 'ja'
+        ? 'あなたの価値観に合わせて人生憲法をリアルタイム更新しました。'
+        : (locale === 'en' ? 'Updated your life constitution according to your values.' : '당신의 가치관에 맞춰 헌법을 실시간 갱신했습니다.');
+      const reply = data.voice_reply || data.reply || defaultReply;
 
       const assistantMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -768,7 +801,10 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
       if (data.updated_goals) {
         setGoals(data.updated_goals);
         setLastFocusCategory(data.focus_category);
-        setSaveMessage(`[${data.focus_category?.toUpperCase()}] 헌법 조항이 실시간 갱신되었습니다.`);
+        const notice = locale === 'ja'
+          ? `[${data.focus_category?.toUpperCase()}] 憲法条項がリアルタイム更新されました。`
+          : `[${data.focus_category?.toUpperCase()}] 헌법 조항이 실시간 갱신되었습니다.`;
+        setSaveMessage(notice);
         setTimeout(() => setSaveMessage(null), 4000);
       }
 
@@ -777,16 +813,15 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
         setIsDynamicPrompts(true);
       }
 
-      // 라이브 모드가 아닐 때만 브라우저 TTS 실행 (Live 모드에서는 순수 네이티브 Live만 사용)
-      if (!isLiveActiveRef.current) {
-        speakText(reply);
-      }
+      // CRITICAL FIX: HTTP 폴백 모드에서는 네이티브 PCM 스트림이 없으므로 브라우저 TTS를 반드시 실행하여 제미니의 음성을 들려줌!
+      speakText(reply);
 
     } catch (e) {
       console.error('Error processing live voice:', e);
-      if (!isLiveActiveRef.current) {
-        speakText('일시적인 음성 통신 지연이 발생했습니다. 다시 말씀해 주시겠어요?');
-      }
+      const errMsg = locale === 'ja'
+        ? '一時的な音声通信の遅延が発生しました。もう一度お話しいただけますか？'
+        : '일시적인 음성 통신 지연이 발생했습니다. 다시 말씀해 주시겠어요?';
+      speakText(errMsg);
     } finally {
       setIsChatLoading(false);
     }
@@ -813,44 +848,78 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
       clearTimeout(speakingTimeoutRef.current);
     }
     
-    // AudioContext 자체를 일시 중지할 필요 없이 source.stop()만으로도 충분함
-    setLiveTranscript('말씀하세요! 경청하고 있습니다...');
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    
+    const bargeMsg = locale === 'ja' ? 'お話しください！聞いています...' : (locale === 'en' ? 'Listening to you...' : '말씀하세요! 경청하고 있습니다...');
+    setLiveTranscript(bargeMsg);
   };
 
-  // ── 브라우저 TTS 폴백 ──
+  // ── 브라우저 TTS 폴백 (로케일에 맞춘 자연스러운 다국어 음성 출력) ──
   const speakText = (text: string) => {
     if (isAudioMuted || typeof window === 'undefined' || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ko-KR';
-    utterance.rate = 1.05;
-    utterance.pitch = 1.0;
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    speechSynthRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      const langMap: Record<string, string> = { ja: 'ja-JP', en: 'en-US', ko: 'ko-KR' };
+      utterance.lang = langMap[locale] || 'ja-JP';
+
+      try {
+        const voices = window.speechSynthesis.getVoices();
+        if (voices && voices.length > 0) {
+          const targetPrefix = locale.toLowerCase();
+          const matched = voices.find(v => v.lang.toLowerCase().replace('_', '-').startsWith(targetPrefix)) ||
+                          voices.find(v => v.lang.toLowerCase().includes(targetPrefix));
+          if (matched) {
+            utterance.voice = matched;
+          }
+        }
+      } catch (ve) {
+        // Voice selection error fallback
+      }
+
+      utterance.rate = 1.05;
+      utterance.pitch = 1.0;
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+      speechSynthRef.current = utterance;
+      window.speechSynthesis.speak(utterance);
+    } catch (err) {
+      console.warn('speakText error:', err);
+      setIsSpeaking(false);
+    }
   };
 
-  // ── 브라우저 마이크 시작 (SpeechRecognition) ──
+  // ── 브라우저 마이크 시작 (SpeechRecognition - 로케일 일치 STT) ──
   const startListening = () => {
     if (typeof window === 'undefined') return;
 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert('사용하시는 브라우저가 음성 인식을 지원하지 않습니다. Chrome 브라우저를 권장합니다. 하단의 빠른 음성 발화 칩으로 즉시 테스트하실 수 있습니다.');
+      const alertMsg = locale === 'ja'
+        ? 'お使いのブラウザは音声認識をサポートしていません。Chromeブラウザを推奨します。下のクイック発話チップでもテスト可能です。'
+        : '사용하시는 브라우저가 음성 인식을 지원하지 않습니다. Chrome 브라우저를 권장합니다. 하단의 빠른 음성 발화 칩으로 즉시 테스트하실 수 있습니다.';
+      alert(alertMsg);
       return;
     }
 
     try {
       const recognition = new SpeechRecognition();
-      recognition.lang = 'ko-KR';
+      const langMap: Record<string, string> = { ja: 'ja-JP', en: 'en-US', ko: 'ko-KR' };
+      recognition.lang = langMap[locale] || 'ja-JP';
       recognition.continuous = true;
       recognition.interimResults = true;
 
       recognition.onstart = () => {
         setIsListening(true);
-        setLiveTranscript('마이크가 연결되었습니다. 계속해서 말씀하세요.');
+        const startMsgMap: Record<string, string> = {
+          ja: 'マイクが接続されました。お話しください。',
+          ko: '마이크가 연결되었습니다. 계속해서 말씀하세요.',
+          en: 'Microphone connected. Speak freely.'
+        };
+        setLiveTranscript(startMsgMap[locale] || startMsgMap.ja);
       };
 
       recognition.onresult = (event: any) => {
@@ -939,6 +1008,20 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
     } else {
       isLiveActiveRef.current = true;
       setIsLiveActive(true);
+
+      // 사용자 직접 클릭 제스처 시 AudioContext 즉시 활성화/재개 (브라우저 자동재생 정책 대응)
+      try {
+        if (!audioContextRef.current) {
+          const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+          audioContextRef.current = new AudioCtx({ sampleRate: 24000 });
+        }
+        if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+          audioContextRef.current.resume();
+        }
+      } catch (ae) {
+        console.warn('AudioContext resume failed:', ae);
+      }
+
       startNativeMicStream();
       startListening(); // 마이크 하이브리드 음성 인식 동시 가동으로 실시간 연속 대화 활성화!
     }

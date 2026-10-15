@@ -285,7 +285,12 @@ async def goal_chat(req: GoalChatRequest):
     사용자의 고민/상황을 듣고 조언하며 5대 목표를 실시간으로 조율합니다.
     """
     try:
-        result = await goal_manager.chat_and_refine_goals(req.message, req.history, preferred_model=req.model_name)
+        result = await goal_manager.chat_and_refine_goals(
+            req.message, 
+            req.history, 
+            preferred_model=req.model_name,
+            locale=req.locale or "ja"
+        )
         return {"status": "ok", **result}
     except Exception as e:
         logger.error(f"Error in /api/goals/chat: {e}", exc_info=True)
@@ -300,17 +305,20 @@ async def goal_live_voice(req: GoalLiveVoiceRequest):
     5대 인생 헌법 및 목표를 실시간으로 조율하여 업데이트합니다.
     """
     try:
+        loc = (req.locale or "ja").lower()
         result = await goal_manager.chat_and_refine_goals(
             req.voice_transcript, 
             req.history, 
-            preferred_model=req.model_name
+            preferred_model=req.model_name,
+            locale=loc
         )
+        lang_code = "ja-JP" if loc == "ja" else ("en-US" if loc == "en" else "ko-KR")
         return {
             "status": "ok",
             "mode": "gemini-live",
             "voice_reply": result.get("reply", ""),
             "voice_audio_hint": {
-                "lang": "ko-KR",
+                "lang": lang_code,
                 "pitch": 1.0,
                 "rate": req.voice_speed or 1.05,
                 "emotion": "warm_advisory"
@@ -323,15 +331,16 @@ async def goal_live_voice(req: GoalLiveVoiceRequest):
 
 
 @app.websocket("/ws/gemini-live")
-async def gemini_live_websocket(websocket: WebSocket):
+async def gemini_live_websocket(websocket: WebSocket, locale: Optional[str] = "ja"):
     """
     Google GenAI 공식 Gemini 3.8 Live API WebSocket 세션 엔드포인트.
     client.aio.live.connect 기반 양방향 오디오/텍스트 실시간 스트리밍 및 Tool Calling 헌법 조율.
     """
     await websocket.accept()
-    logger.info("🎙️ Gemini 3.8 Live WebSocket client connected.")
+    query_locale = websocket.query_params.get("locale") or locale or "ja"
+    logger.info(f"🎙️ Gemini 3.8 Live WebSocket client connected. Locale: {query_locale}")
     try:
-        await gemini_live_bridge.run_live_session(websocket, goal_manager)
+        await gemini_live_bridge.run_live_session(websocket, goal_manager, locale=query_locale)
     except WebSocketDisconnect:
         logger.info("🎙️ Gemini Live WebSocket client disconnected.")
 @app.get("/api/state/current")

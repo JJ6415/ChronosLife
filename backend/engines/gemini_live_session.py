@@ -23,9 +23,11 @@ class GeminiLiveBridge:
         self,
         client_websocket,
         goal_manager,
+        locale: Optional[str] = "ja",
     ):
         """
         FastAPI WebSocket 클라이언트와 Google Gemini 3.8 Live API 간의 양방향 브릿지 세션을 구동합니다.
+        다국어(ja, ko, en) 음성 인터랙션 및 Tool Calling을 완벽 지원합니다.
         """
         if not self.client:
             await client_websocket.send_text(json.dumps({
@@ -34,24 +36,34 @@ class GeminiLiveBridge:
             }))
             return
 
+        loc = (locale or "ja").lower()
+
         # 헌법 및 목표 조율용 실시간 도구 정의
+        tool_desc = (
+            "ユーザーの5大人生目標（財務、キャリア、健康、家族、趣味）および不変の憲法条項をリアルタイムで制定・更新します。"
+            if loc == "ja" else
+            ("사용자의 5대 인생 목표(재정, 커리어, 건강, 가족, 취미) 및 불변의 헌법 조항을 실시간 갱신합니다."
+             if loc == "ko" else
+             "Real-time update of user's 5 life goals (finance, career, health, family, hobby) and constitutional tenets.")
+        )
+
         tools = [
             types.Tool(function_declarations=[
                 types.FunctionDeclaration(
                     name="update_life_goal",
-                    description="사용자의 5대 인생 목표(재정, 커리어, 건강, 가족, 취미) 및 불변의 헌법 조항을 실시간 갱신합니다.",
+                    description=tool_desc,
                     parameters=types.Schema(
                         type="OBJECT",
                         properties={
                             "category": types.Schema(
                                 type="STRING",
                                 enum=["finance", "career", "health", "family", "hobby"],
-                                description="5대 카테고리 중 하나"
+                                description="One of the 5 categories"
                             ),
-                            "title": types.Schema(type="STRING", description="목표 명칭"),
-                            "target_value": types.Schema(type="STRING", description="구체적 목표 수치 (예: 시드 1억, 주 45시간)"),
-                            "rule": types.Schema(type="STRING", description="일일/주간 제어 규칙"),
-                            "tenet": types.Schema(type="STRING", description="제N조 불변의 헌법 내용")
+                            "title": types.Schema(type="STRING", description="Goal title"),
+                            "target_value": types.Schema(type="STRING", description="Target metric (e.g., 350万円, 週45時間)"),
+                            "rule": types.Schema(type="STRING", description="Daily/weekly constraint rule"),
+                            "tenet": types.Schema(type="STRING", description="Constitutional tenet text")
                         },
                         required=["category", "title", "target_value", "rule", "tenet"]
                     )
@@ -59,18 +71,52 @@ class GeminiLiveBridge:
             ])
         ]
 
-        system_prompt = (
-            "당신은 ChronosLife의 수석 인생 헌법 설계관(Chief Constitution Architect AI, Gemini 3.8 Live)입니다. "
-            "사용자와 실시간 한국어 음성으로 대화하며, 30년을 지탱할 5대 도메인(재정, 커리어, 건강, 가족, 취미)의 인생 목표와 불변의 헌법을 확립합니다. "
-            "핵심 지침: "
-            "1. 한국어로 따뜻하고 프로페셔널하게 1~2문장으로 짧게 요약 답변하세요. "
-            "2. 사용자가 특정 가치관이나 규칙(예: 주말 러닝 4시간, 가족 식사 3회, 주 52시간 상한 등)을 언급하면, 반드시 즉시 update_life_goal 도구를 호출하여 헌법을 제정/갱신하세요. "
-            "3. [지속적인 핑퐁 대화 필수]: 한 번 답변하고 끝내지 말고, 답변 끝에 다른 도메인(재정, 커리어, 건강, 가족, 취미 중 아직 안 나온 영역)에 대해 다음 질문을 던져서 연속 인터뷰를 활발히 이끌어가세요.\n\n"
-            "RESPOND IN ko-KR. YOU MUST RESPOND UNMISTAKABLY IN ko-KR."
-        )
+        if loc == "ja":
+            system_prompt = (
+                "あなたはChronosLifeの首席人生憲法設計官（Chief Constitution Architect AI, Gemini 3.8 Live）です。"
+                "ユーザーとリアルタイムの日本語音声で対話し、30年の人生を支える5大領域（財務、キャリア、健康、家族、個人の趣味）の人生目標と不変の憲法条項を共に確立します。"
+                "核心指針："
+                "1. 日本語で温かくプロフェッショナルに、1〜2文で短く簡潔に共感と助言を返してください。"
+                "2. ユーザーが特定の価値観や習慣、ルール（例：週末ランニング4時間、家族の夕食週3回、残業上限、自己投資など）に言及したら、直ちに update_life_goal ツールを呼び出して人生憲法を更新・制定してください。"
+                "3. [継続的なピンポン対話必須]：一度答えて終わりにせず、回答の最後にまだ触れていない他の領域について次の質問を自然に投げかけ、連続インタビューをリードしてください。\n\n"
+                "RESPOND IN ja-JP. YOU MUST RESPOND UNMISTAKABLY IN NATURAL JAPANESE (ja-JP)."
+            )
+            connected_msg = "Gemini 3.8 Live API セッションが接続されました。お話しください。"
+            voice_name = "Kore"
+        elif loc == "en":
+            system_prompt = (
+                "You are ChronosLife's Chief Constitution Architect AI (Gemini 3.8 Live). "
+                "Engage in real-time voice coaching in English with the user to co-design 30-year life goals and immutable constitutional tenets across 5 domains (finance, career, health, family, hobby). "
+                "Core Guidelines: "
+                "1. Respond warmly and professionally in 1-2 concise sentences. "
+                "2. When the user specifies any rule or value, immediately invoke update_life_goal. "
+                "3. Conclude with a natural follow-up question to guide continuous dialogue.\n\n"
+                "RESPOND IN en-US. YOU MUST RESPOND UNMISTAKABLY IN en-US."
+            )
+            connected_msg = "Gemini 3.8 Live session connected. Speak comfortably."
+            voice_name = "Aoede"
+        else:
+            system_prompt = (
+                "당신은 ChronosLife의 수석 인생 헌법 설계관(Chief Constitution Architect AI, Gemini 3.8 Live)입니다. "
+                "사용자와 실시간 한국어 음성으로 대화하며, 30년을 지탱할 5대 도메인(재정, 커리어, 건강, 가족, 취미)의 인생 목표와 불변의 헌법을 확립합니다. "
+                "핵심 지침: "
+                "1. 한국어로 따뜻하고 프로페셔널하게 1~2문장으로 짧게 요약 답변하세요. "
+                "2. 사용자가 특정 가치관이나 규칙(예: 주말 러닝 4시간, 가족 식사 3회, 주 52시간 상한 등)을 언급하면, 반드시 즉시 update_life_goal 도구를 호출하여 헌법을 제정/갱신하세요. "
+                "3. [지속적인 핑퐁 대화 필수]: 한 번 답변하고 끝내지 말고, 답변 끝에 다른 도메인(재정, 커리어, 건강, 가족, 취미 중 아직 안 나온 영역)에 대해 다음 질문을 던져서 연속 인터뷰를 활발히 이끌어가세요.\n\n"
+                "RESPOND IN ko-KR. YOU MUST RESPOND UNMISTAKABLY IN ko-KR."
+            )
+            connected_msg = "Gemini 3.8 Live API 세션이 연결되었습니다. 말씀하세요."
+            voice_name = "Kore"
 
         config = types.LiveConnectConfig(
             response_modalities=["AUDIO"], # 네이티브 오디오 PCM 출력
+            speech_config=types.SpeechConfig(
+                voice_config=types.VoiceConfig(
+                    prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                        voice_name=voice_name
+                    )
+                )
+            ),
             system_instruction=types.Content(parts=[types.Part.from_text(text=system_prompt)]),
             tools=tools,
             context_window_compression=types.ContextWindowCompressionConfig(
@@ -80,13 +126,14 @@ class GeminiLiveBridge:
         )
 
         try:
-            logger.info("Connecting to Google Gemini 3.8 Live API...")
+            logger.info(f"Connecting to Google Gemini 3.8 Live API (locale={loc}, voice={voice_name})...")
             async with self.client.aio.live.connect(model=self.model, config=config) as session:
                 logger.info("Gemini 3.8 Live session established!")
                 await client_websocket.send_text(json.dumps({
                     "type": "session_connected",
                     "model": self.model,
-                    "message": "Gemini 3.8 Live API 세션이 연결되었습니다. 말씀하세요."
+                    "locale": loc,
+                    "message": connected_msg
                 }))
 
                 # 두 개의 비동기 태스크 병렬 실행: 클라이언트 수신 -> Gemini 전송 / Gemini 수신 -> 클라이언트 전송
@@ -172,13 +219,20 @@ class GeminiLiveBridge:
                                             updated_item = goal_manager.update_goal(category, updates)
                                             all_goals = goal_manager.get_goals()
 
+                                            update_msg = (
+                                                f"Gemini 3.8 Liveが[{category.upper()}]人生憲法をリアルタイム更新しました。"
+                                                if loc == "ja" else
+                                                (f"Gemini 3.8 Live가 [{category.upper()}] 헌법을 실시간 갱신했습니다."
+                                                 if loc == "ko" else
+                                                 f"Gemini 3.8 Live updated the [{category.upper()}] constitution in real-time.")
+                                            )
                                             # 클라이언트에 실시간 헌법 조항 갱신 이벤트 푸시!
                                             await client_websocket.send_text(json.dumps({
                                                 "type": "goal_updated",
                                                 "category": category,
                                                 "goal": updated_item,
                                                 "all_goals": all_goals,
-                                                "message": f"Gemini 3.8 Live가 [{category.upper()}] 헌법을 실시간 갱신했습니다."
+                                                "message": update_msg
                                             }))
 
                                             result = {"status": "success", "updated_goal": updated_item}

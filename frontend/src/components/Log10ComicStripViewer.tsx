@@ -324,7 +324,7 @@ export default function Log10ComicStripViewer({ comic }: Log10ComicStripViewerPr
           return (
             <div
               key={idx}
-              onClick={() => setSelectedPanel({ ...cut, image_url: currentImg })}
+              onClick={() => setSelectedPanel({ ...cut, image_url: currentImg || undefined })}
               className="group relative flex flex-col rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 overflow-hidden cursor-pointer flex-shrink-0"
             >
               {/* 상단 컷 배지 & 지평 스케일 */}
