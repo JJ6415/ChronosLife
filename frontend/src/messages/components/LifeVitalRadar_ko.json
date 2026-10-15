@@ -38,6 +38,19 @@
     "lifeguardWarningHighlight": "‘보상 심리성 충동 일탈’",
     "lifeguardWarning2": "일 확률이 85% 이상입니다. 결정을 확정하기 전 10분간의 완충 호흡을 권장합니다.",
     "liveUpdatedBadge": "대화 실시간 반영 (Live Synced)",
-    "updatingBadge": "실시간 분석 중..."
+    "updatingBadge": "실시간 분석 중...",
+    "presetBurnout": "🔥 한계 야근 (위기)",
+    "presetBalanced": "⚖️ 황금 밸런스 (안정)",
+    "presetFrugal": "🌱 극한의 절약 (수행자)",
+    "btnManualTuning": "직접 수정",
+    "btnReset": "초기화",
+    "applyAndSync": "적용 & 서버 저장",
+    "sliderBudgetDrain": "주간 예산 소진율",
+    "sliderBurnout": "번아웃 지수",
+    "sliderSleepDebt": "수면 부채 (누적)",
+    "sliderOverworkDays": "연속 야근 일수",
+    "sliderHobbyHours": "주간 취미 시간",
+    "sliderFamilyDinners": "가족과의 저녁 식사",
+    "manualTuningGuide": "최근 7일 팩트 바이탈을 직접 조율할 수 있습니다. 슬라이더 수치는 AI 심의회 및 최고 가버너 판정에 즉시 반영됩니다."
   }
 }

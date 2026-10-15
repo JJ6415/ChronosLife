@@ -321,7 +321,20 @@
     "lifeguardWarningHighlight": "'reward psychology impulsive deviation'",
     "lifeguardWarning2": " (over 85% probability). We recommend a 10-minute buffer breathing before finalizing decisions.",
     "liveUpdatedBadge": "Dialogue Live Synced",
-    "updatingBadge": "Real-time Analyzing..."
+    "updatingBadge": "Real-time Analyzing...",
+    "presetBurnout": "🔥 Crisis Overwork",
+    "presetBalanced": "⚖️ Golden Balance",
+    "presetFrugal": "🌱 Frugal Monk",
+    "btnManualTuning": "Manual Tuning",
+    "btnReset": "Reset",
+    "applyAndSync": "Apply & Save to Server",
+    "sliderBudgetDrain": "Weekly Budget Drain",
+    "sliderBurnout": "Burnout Index",
+    "sliderSleepDebt": "Sleep Debt (Accumulated)",
+    "sliderOverworkDays": "Consecutive Overwork Days",
+    "sliderHobbyHours": "Weekly Hobby Hours",
+    "sliderFamilyDinners": "Weekly Family Dinners",
+    "manualTuningGuide": "Directly adjust the 7-day fact vitals. Slider changes will immediately reflect in Council and Governor deliberations."
   },
   "Log10ComicStripViewer": {
     "theme_neon_night_title": "Rainy Neon City (10⁰)",

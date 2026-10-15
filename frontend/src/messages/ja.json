@@ -321,7 +321,20 @@
     "lifeguardWarningHighlight": "「報酬心理的な衝動逸脱」",
     "lifeguardWarning2": "である確率が85%以上です。決定を確定する前に、10分間の緩衝呼吸をお勧めします。",
     "liveUpdatedBadge": "対話反映 (Live Synced)",
-    "updatingBadge": "リアルタイム分析中..."
+    "updatingBadge": "リアルタイム分析中...",
+    "presetBurnout": "🔥 限界残業 (危機)",
+    "presetBalanced": "⚖️ 黄金バランス (安定)",
+    "presetFrugal": "🌱 極限の倹約 (修行僧)",
+    "btnManualTuning": "直接修正",
+    "btnReset": "初期化",
+    "applyAndSync": "適用 & サーバー保存",
+    "sliderBudgetDrain": "週間予算消化率",
+    "sliderBurnout": "バーンアウト指数",
+    "sliderSleepDebt": "睡眠負債 (累積)",
+    "sliderOverworkDays": "連続残業日数",
+    "sliderHobbyHours": "週間趣味時間",
+    "sliderFamilyDinners": "家族との夕食",
+    "manualTuningGuide": "7日間のファクトバイタルを直接調整できます。スライダーの数値はAI審議会・ガバナーの判定に即座に反映されます。"
   },
   "Log10ComicStripViewer": {
     "theme_neon_night_title": "Rainy Neon City (10⁰)",

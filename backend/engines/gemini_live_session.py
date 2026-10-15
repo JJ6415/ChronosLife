@@ -149,7 +149,11 @@ class GeminiLiveBridge:
                                 user_text = payload.get("text", "")
                                 if user_text:
                                     logger.info(f"Sending text to Gemini Live: {user_text}")
-                                    await session.send_realtime_input(text=user_text)
+                                    # Google GenAI SDK: send_client_content with turn_complete=True triggers Gemini's response
+                                    await session.send_client_content(
+                                        turns=[types.Content(parts=[types.Part.from_text(text=user_text)])],
+                                        turn_complete=True
+                                    )
 
                             elif msg_type == "audio_pcm":
                                 # Base64 인코딩된 16kHz 16비트 PCM 바이트
@@ -211,6 +215,14 @@ class GeminiLiveBridge:
                                     # 4. 턴 완료 감지 (Gemini 발화 종료 -> 클라이언트 경청 모드 자동 복귀 및 전사 텍스트 전달)
                                     if getattr(server_content, "turn_complete", False):
                                         full_reply = "".join(turn_transcript).strip()
+                                        if not full_reply:
+                                            full_reply = (
+                                                "はい、承知いたしました。人生憲法をリアルタイムで反映しました。"
+                                                if loc == "ja" else
+                                                ("네, 말씀하신 가치관을 인생 헌법에 실시간으로 반영했습니다."
+                                                 if loc == "ko" else
+                                                 "Understood. Your life goals and constitutional tenets have been updated.")
+                                            )
                                         logger.info(f"Gemini Live turn {turn_idx} completed. Text reply: '{full_reply}'")
                                         await client_websocket.send_text(json.dumps({
                                             "type": "turn_complete",

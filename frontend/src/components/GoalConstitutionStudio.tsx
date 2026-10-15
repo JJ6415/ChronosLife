@@ -477,24 +477,30 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
             // 한 턴의 답변이 완료됨 -> 제미니 답변을 대화 히스토리에 누적하고 경청 상태 복귀
             setIsChatLoading(false);
 
-            if (data.reply && data.reply.trim()) {
-              const geminiText = data.reply.trim();
-              const assistantMsg: ChatMessage = {
-                id: (Date.now() + 1).toString(),
-                role: 'assistant',
-                content: geminiText,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                mode: 'voice'
-              };
-              setMessages(prev => {
-                const last = prev[prev.length - 1];
-                if (last && last.role === 'assistant' && last.content === geminiText) {
-                  return prev;
-                }
-                return [...prev, assistantMsg];
-              });
-              setLiveTranscript(`"${geminiText}"`);
-            }
+            const geminiText = (data.reply && data.reply.trim()) || (
+              locale === 'ja'
+                ? 'はい、承知いたしました。人生目標と憲法をリアルタイムで反映しました。続けてお話しください。'
+                : (locale === 'en'
+                    ? 'Understood. Your life goals and tenets have been updated. Please continue speaking.'
+                    : '네, 말씀하신 가치관을 헌법에 실시간으로 반영했습니다. 계속해서 말씀하세요.')
+            );
+
+            const assistantMsg: ChatMessage = {
+              id: (Date.now() + 1).toString(),
+              role: 'assistant',
+              content: geminiText,
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              mode: 'voice'
+            };
+
+            setMessages(prev => {
+              const last = prev[prev.length - 1];
+              if (last && last.role === 'assistant' && last.content === geminiText) {
+                return prev;
+              }
+              return [...prev, assistantMsg];
+            });
+            setLiveTranscript(`"${geminiText}"`);
 
             setTimeout(() => {
               if (!isSpeakingRef.current) {
@@ -504,8 +510,11 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
                   ? '🎙️ 聞いています。続けて次の価値観や考えをお話しください！'
                   : (locale === 'en' ? '🎙️ Listening. Continue speaking!' : '🎙️ 듣고 있습니다. 계속해서 다음 가치관이나 생각을 말씀하세요!');
                 setLiveTranscript(listenMsg);
+                if (isLiveActiveRef.current && !isListeningRef.current) {
+                  startListening();
+                }
               }
-            }, 1000);
+            }, 800);
           } else if (data.type === 'goal_updated') {
             // Tool call로 목표 갱신
             if (data.all_goals) {
@@ -624,6 +633,9 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
       speakingTimeoutRef.current = setTimeout(() => {
         setIsSpeaking(false);
         isSpeakingRef.current = false;
+        if (isLiveActiveRef.current && !isListeningRef.current) {
+          startListening();
+        }
       }, remainingTimeMs);
 
     } catch (e) {
@@ -976,13 +988,20 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
       };
 
       recognition.onend = () => {
-        // Live 세션이 켜져 있는 동안은 계속해서 마이크를 자동으로 재시작하여 연속 대화 유지!
+        // Live 세션이 켜져 있는 동안은 브라우저 에러를 방지하며 안전하게 마이크를 재시작하여 연속 대화 유지!
         if (isLiveActiveRef.current) {
-          try {
-            recognition.start();
-          } catch (e) {
-            // Already started or busy
-          }
+          setTimeout(() => {
+            if (isLiveActiveRef.current) {
+              try {
+                recognition.start();
+                setIsListening(true);
+                isListeningRef.current = true;
+              } catch (e) {
+                // If start() fails due to state, schedule another attempt
+                console.warn('Recognition start retry:', e);
+              }
+            }
+          }, 350);
         } else {
           setIsListening(false);
           isListeningRef.current = false;

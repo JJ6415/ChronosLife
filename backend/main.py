@@ -84,6 +84,82 @@ def init_user_history_window() -> list[DailySnapshot]:
     ]
     return _USER_HISTORY_WINDOW
 
+def set_preset_history_window(preset_id: str) -> list[DailySnapshot]:
+    global _USER_HISTORY_WINDOW
+    base_date = datetime.now() - timedelta(days=7)
+    if preset_id == "burnout":
+        # 1. バーンアウト危機・限界残業プリセット (4일 연속 11~12h 야근, 수면 4.8h, 지출 과열, 취미/가족 0)
+        _USER_HISTORY_WINDOW = [
+            DailySnapshot(date=(base_date + timedelta(days=0)).strftime("%m-%d"), expense_total=32000.0, sleep_hours=6.0, work_hours=10.0, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=1)).strftime("%m-%d"), expense_total=45000.0, sleep_hours=5.5, work_hours=10.5, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=2)).strftime("%m-%d"), expense_total=42000.0, sleep_hours=5.2, work_hours=11.0, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=3)).strftime("%m-%d"), expense_total=58000.0, sleep_hours=5.0, work_hours=12.0, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=4)).strftime("%m-%d"), expense_total=62000.0, sleep_hours=4.8, work_hours=12.5, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=5)).strftime("%m-%d"), expense_total=68000.0, sleep_hours=4.5, work_hours=13.0, family_dinner=False, hobby_minutes=0),
+            DailySnapshot(date=(base_date + timedelta(days=6)).strftime("%m-%d"), expense_total=52000.0, sleep_hours=5.0, work_hours=12.0, family_dinner=False, hobby_minutes=0),
+        ]
+    elif preset_id == "balanced":
+        # 2. 黄金のバランス・安定調和プリセット (수면 7.5h 충분, 칼퇴 및 8h 근무, 지출 적정 45%, 취미 4시간, 가족 식사 4회)
+        _USER_HISTORY_WINDOW = [
+            DailySnapshot(date=(base_date + timedelta(days=0)).strftime("%m-%d"), expense_total=18000.0, sleep_hours=7.5, work_hours=8.0, family_dinner=True, hobby_minutes=40),
+            DailySnapshot(date=(base_date + timedelta(days=1)).strftime("%m-%d"), expense_total=22000.0, sleep_hours=7.5, work_hours=8.0, family_dinner=True, hobby_minutes=30),
+            DailySnapshot(date=(base_date + timedelta(days=2)).strftime("%m-%d"), expense_total=15000.0, sleep_hours=7.2, work_hours=8.5, family_dinner=False, hobby_minutes=30),
+            DailySnapshot(date=(base_date + timedelta(days=3)).strftime("%m-%d"), expense_total=20000.0, sleep_hours=7.5, work_hours=8.0, family_dinner=True, hobby_minutes=40),
+            DailySnapshot(date=(base_date + timedelta(days=4)).strftime("%m-%d"), expense_total=25000.0, sleep_hours=7.8, work_hours=7.5, family_dinner=False, hobby_minutes=40),
+            DailySnapshot(date=(base_date + timedelta(days=5)).strftime("%m-%d"), expense_total=12000.0, sleep_hours=8.0, work_hours=0.0, family_dinner=True, hobby_minutes=60),
+            DailySnapshot(date=(base_date + timedelta(days=6)).strftime("%m-%d"), expense_total=14000.0, sleep_hours=7.5, work_hours=0.0, family_dinner=False, hobby_minutes=0),
+        ]
+    elif preset_id == "frugal":
+        # 3. 極限の倹約・修行僧プリセット (하루 지출 5,000~8,000엔 통제, 수면 7.4h, 근무 8.2h, 절약 복리 극대화)
+        _USER_HISTORY_WINDOW = [
+            DailySnapshot(date=(base_date + timedelta(days=0)).strftime("%m-%d"), expense_total=6000.0, sleep_hours=7.2, work_hours=8.5, family_dinner=True, hobby_minutes=20),
+            DailySnapshot(date=(base_date + timedelta(days=1)).strftime("%m-%d"), expense_total=8000.0, sleep_hours=7.0, work_hours=8.5, family_dinner=False, hobby_minutes=20),
+            DailySnapshot(date=(base_date + timedelta(days=2)).strftime("%m-%d"), expense_total=5000.0, sleep_hours=7.2, work_hours=8.5, family_dinner=True, hobby_minutes=15),
+            DailySnapshot(date=(base_date + timedelta(days=3)).strftime("%m-%d"), expense_total=7000.0, sleep_hours=7.5, work_hours=8.0, family_dinner=False, hobby_minutes=15),
+            DailySnapshot(date=(base_date + timedelta(days=4)).strftime("%m-%d"), expense_total=9000.0, sleep_hours=7.2, work_hours=8.5, family_dinner=True, hobby_minutes=20),
+            DailySnapshot(date=(base_date + timedelta(days=5)).strftime("%m-%d"), expense_total=8000.0, sleep_hours=8.0, work_hours=0.0, family_dinner=False, hobby_minutes=30),
+            DailySnapshot(date=(base_date + timedelta(days=6)).strftime("%m-%d"), expense_total=6000.0, sleep_hours=7.5, work_hours=0.0, family_dinner=False, hobby_minutes=0),
+        ]
+    else:
+        init_user_history_window()
+    return _USER_HISTORY_WINDOW
+
+def set_custom_history_window(
+    budget_drain_pct: float = 50.0,
+    burnout_index: float = 30.0,
+    sleep_debt_hours: float = 2.0,
+    consecutive_overwork_days: int = 0,
+    weekly_hobby_minutes: int = 120,
+    weekly_family_dinners: int = 2
+) -> list[DailySnapshot]:
+    """사용자가 직접 슬라이더/인풋으로 조율한 바이탈 수치를 7일 스냅샷 배열로 합성합니다."""
+    global _USER_HISTORY_WINDOW
+    base_date = datetime.now() - timedelta(days=7)
+    total_budget_yen = 280000.0 * (budget_drain_pct / 100.0)
+    daily_expense = round(total_budget_yen / 7.0, 1)
+
+    daily_sleep = max(4.0, min(9.0, 7.5 - (sleep_debt_hours / 3.0)))
+    daily_hobby = max(0, int(weekly_hobby_minutes / 5))
+
+    new_snaps = []
+    for i in range(7):
+        is_overwork = (7 - i) <= consecutive_overwork_days
+        w_hours = 11.5 if is_overwork else 8.0
+        f_dinner = (i < weekly_family_dinners)
+        h_mins = 0 if is_overwork else daily_hobby
+        s_hours = (daily_sleep - 0.5) if is_overwork else daily_sleep
+
+        new_snaps.append(DailySnapshot(
+            date=(base_date + timedelta(days=i)).strftime("%m-%d"),
+            expense_total=daily_expense,
+            sleep_hours=round(s_hours, 1),
+            work_hours=round(w_hours, 1),
+            family_dinner=f_dinner,
+            hobby_minutes=h_mins
+        ))
+    _USER_HISTORY_WINDOW = new_snaps
+    return _USER_HISTORY_WINDOW
+
 def get_user_history_window() -> list[DailySnapshot]:
     global _USER_HISTORY_WINDOW
     if not _USER_HISTORY_WINDOW:
@@ -184,6 +260,21 @@ class UpdateGoalRequest(BaseModel):
 
 class AiGenerateGoalRequest(BaseModel):
     persona: str = "30대 직장인"
+
+
+class StatePresetRequest(BaseModel):
+    preset_id: str
+    locale: Optional[str] = "ja"
+
+
+class CustomStateRequest(BaseModel):
+    budget_drain_pct: Optional[float] = 50.0
+    burnout_index: Optional[float] = 30.0
+    sleep_debt_hours: Optional[float] = 2.0
+    consecutive_overwork_days: Optional[int] = 0
+    weekly_hobby_minutes: Optional[int] = 120
+    weekly_family_dinners: Optional[int] = 2
+    locale: Optional[str] = "ja"
 
 
 # ─── Startup Event ──────────────────────────────────────────
@@ -383,6 +474,39 @@ async def reset_current_life_state(locale: Optional[str] = "ja"):
     """
     init_user_history_window()
     return await get_current_life_state(locale=locale)
+
+
+@app.post("/api/state/preset")
+async def apply_state_preset(req: StatePresetRequest):
+    """
+    3가지 핵심 데모 프리셋(burnout, balanced, frugal)을 주간 라이프 히스토리에 즉각 적용합니다.
+    """
+    try:
+        set_preset_history_window(req.preset_id)
+        return await get_current_life_state(locale=req.locale)
+    except Exception as e:
+        logger.error(f"Error applying state preset: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/state/custom")
+async def apply_custom_state(req: CustomStateRequest):
+    """
+    사용자가 슬라이더 등으로 직접 조율한 4대 바이탈 수치를 7일 스냅샷 배열로 즉각 합성/적용합니다.
+    """
+    try:
+        set_custom_history_window(
+            budget_drain_pct=req.budget_drain_pct or 50.0,
+            burnout_index=req.burnout_index or 30.0,
+            sleep_debt_hours=req.sleep_debt_hours or 2.0,
+            consecutive_overwork_days=req.consecutive_overwork_days or 0,
+            weekly_hobby_minutes=req.weekly_hobby_minutes or 120,
+            weekly_family_dinners=req.weekly_family_dinners or 2
+        )
+        return await get_current_life_state(locale=req.locale)
+    except Exception as e:
+        logger.error(f"Error applying custom state: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/analyze")
