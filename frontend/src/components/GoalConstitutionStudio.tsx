@@ -469,9 +469,33 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
           } else if (data.type === 'interrupted') {
             // 사용자 발화로 인한 인터럽트 처리 - 오디오 버퍼 즉시 삭제 (Live API 권장사항)
             interruptSpeaking();
+          } else if (data.type === 'text_chunk') {
+            if (data.delta) {
+              setLiveTranscript(prev => (prev.startsWith('🎙️') || prev.startsWith('"') ? data.delta : prev + data.delta));
+            }
           } else if (data.type === 'turn_complete') {
-            // 한 턴의 답변이 완료됨 -> 사용자 경청 상태 복귀
+            // 한 턴의 답변이 완료됨 -> 제미니 답변을 대화 히스토리에 누적하고 경청 상태 복귀
             setIsChatLoading(false);
+
+            if (data.reply && data.reply.trim()) {
+              const geminiText = data.reply.trim();
+              const assistantMsg: ChatMessage = {
+                id: (Date.now() + 1).toString(),
+                role: 'assistant',
+                content: geminiText,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                mode: 'voice'
+              };
+              setMessages(prev => {
+                const last = prev[prev.length - 1];
+                if (last && last.role === 'assistant' && last.content === geminiText) {
+                  return prev;
+                }
+                return [...prev, assistantMsg];
+              });
+              setLiveTranscript(`"${geminiText}"`);
+            }
+
             setTimeout(() => {
               if (!isSpeakingRef.current) {
                 setIsSpeaking(false);
@@ -1514,7 +1538,7 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
 
             {/* 실시간 연속 대화 히스토리 피드 (Live Multi-turn Feed) */}
             {messages.length > 1 && (
-              <div className="w-full max-w-xl p-3 rounded-2xl bg-slate-950/60 border border-purple-500/20 space-y-2 max-h-36 overflow-y-auto">
+              <div className="w-full max-w-xl p-3 rounded-2xl bg-slate-950/60 border border-purple-500/20 space-y-2 max-h-52 overflow-y-auto">
                 <div className="flex items-center justify-between text-[10px] text-purple-300 font-bold border-b border-purple-500/10 pb-1">
                   <span>💬 {t("liveChatHistory", { count: messages.length - 1 })}</span>
                   <span className="text-emerald-400 flex items-center gap-1">
@@ -1523,7 +1547,7 @@ export default function GoalConstitutionStudio({ onProceedToDashboard }: GoalCon
                   </span>
                 </div>
                 <div className="space-y-1.5">
-                  {messages.slice(-4).map((msg, i) => (
+                  {messages.slice(-6).map((msg, i) => (
                     <div
                       key={msg.id || i}
                       className={`text-[11px] p-2 rounded-xl flex items-start gap-2 ${

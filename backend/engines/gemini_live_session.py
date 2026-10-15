@@ -117,6 +117,7 @@ class GeminiLiveBridge:
                     )
                 )
             ),
+            output_audio_transcription=types.AudioTranscriptionConfig(), # Gemini 음성 실시간 텍스트 전사
             system_instruction=types.Content(parts=[types.Part.from_text(text=system_prompt)]),
             tools=tools,
             context_window_compression=types.ContextWindowCompressionConfig(
@@ -173,6 +174,7 @@ class GeminiLiveBridge:
                         turn_idx = 1
                         while True:
                             received_in_turn = 0
+                            turn_transcript = []
                             logger.info(f"Awaiting Gemini Live turn {turn_idx} responses...")
                             async for response in session.receive():
                                 received_in_turn += 1
@@ -182,7 +184,18 @@ class GeminiLiveBridge:
                                     if getattr(server_content, "interrupted", False):
                                         await client_websocket.send_text(json.dumps({"type": "interrupted"}))
 
-                                    # 2. 서버 오디오 스트림 수신
+                                    # 2. 실시간 음성 전사 텍스트 수신 (output_transcription)
+                                    ot = getattr(server_content, "output_transcription", None)
+                                    if ot:
+                                        t_text = getattr(ot, "text", "") or (ot.get("text", "") if isinstance(ot, dict) else "")
+                                        if t_text:
+                                            turn_transcript.append(t_text)
+                                            await client_websocket.send_text(json.dumps({
+                                                "type": "text_chunk",
+                                                "delta": t_text
+                                            }))
+
+                                    # 3. 서버 오디오 스트림 수신
                                     if server_content.model_turn:
                                         for part in server_content.model_turn.parts:
                                             if part.inline_data and part.inline_data.data:
@@ -192,11 +205,17 @@ class GeminiLiveBridge:
                                                     "type": "audio_chunk",
                                                     "data": audio_b64
                                                 }))
+                                            if part.text:
+                                                turn_transcript.append(part.text)
 
-                                    # 3. 턴 완료 감지 (Gemini 발화 종료 -> 클라이언트 경청 모드 자동 복귀)
+                                    # 4. 턴 완료 감지 (Gemini 발화 종료 -> 클라이언트 경청 모드 자동 복귀 및 전사 텍스트 전달)
                                     if getattr(server_content, "turn_complete", False):
-                                        logger.info(f"Gemini Live turn {turn_idx} completed.")
-                                        await client_websocket.send_text(json.dumps({"type": "turn_complete"}))
+                                        full_reply = "".join(turn_transcript).strip()
+                                        logger.info(f"Gemini Live turn {turn_idx} completed. Text reply: '{full_reply}'")
+                                        await client_websocket.send_text(json.dumps({
+                                            "type": "turn_complete",
+                                            "reply": full_reply
+                                        }))
                                         turn_idx += 1
                                         break
 
